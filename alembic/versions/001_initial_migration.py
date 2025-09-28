@@ -22,8 +22,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('hashed_password', sa.String(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), server_default=sa.text("(true)"), nullable=True),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+    sa.Column('is_active', sa.Boolean(), server_default=sa.text('1'), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.func.current_timestamp(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
