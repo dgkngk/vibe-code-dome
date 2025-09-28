@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
 
 import app.models as models
 import app.schemas as schemas
+
+from app.auth import get_password_hash
 
 
 def get_user_by_email(db: Session, email: str):
@@ -10,7 +11,7 @@ def get_user_by_email(db: Session, email: str):
 
 
 def create_user(db: Session, user: schemas.UserCreate):
-    hashed_password = getattr(app.auth, 'get_password_hash')(user.password)  # Assuming auth.py has this
+    hashed_password = get_password_hash(user.password)
     db_user = models.User(email=user.email, hashed_password=hashed_password)
     db.add(db_user)
     db.commit()

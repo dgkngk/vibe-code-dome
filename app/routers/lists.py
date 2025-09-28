@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, schemas, models
 from app.auth import get_user
 from app.database import get_db
 
@@ -17,9 +17,9 @@ def create_list_for_board(
     db: Session = Depends(get_db)
 ):
     # Check if user owns the board via workspace
-    board = db.query(app.models.Board).join(app.models.Workspace).filter(
-        app.models.Board.id == board_id,
-        app.models.Workspace.owner_id == current_user.id
+    board = db.query(models.Board).join(models.Workspace).filter(
+        models.Board.id == board_id,
+        models.Workspace.owner_id == current_user.id
     ).first()
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
@@ -29,9 +29,9 @@ def create_list_for_board(
 @router.get("/{board_id}/lists/", response_model=List[schemas.List])
 def read_lists(board_id: int, current_user = Depends(get_user), db: Session = Depends(get_db)):
     # Check ownership
-    board = db.query(app.models.Board).join(app.models.Workspace).filter(
-        app.models.Board.id == board_id,
-        app.models.Workspace.owner_id == current_user.id
+    board = db.query(models.Board).join(models.Workspace).filter(
+        models.Board.id == board_id,
+        models.Workspace.owner_id == current_user.id
     ).first()
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")

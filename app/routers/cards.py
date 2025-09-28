@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, schemas, models
 from app.auth import get_user
 from app.database import get_db
 
@@ -17,9 +17,9 @@ def create_card_for_list(
     db: Session = Depends(get_db)
 ):
     # Check if user owns the list via board/workspace
-    list_item = db.query(app.models.List).join(app.models.Board).join(app.models.Workspace).filter(
-        app.models.List.id == list_id,
-        app.models.Workspace.owner_id == current_user.id
+    list_item = db.query(models.List).join(models.Board).join(models.Workspace).filter(
+        models.List.id == list_id,
+        models.Workspace.owner_id == current_user.id
     ).first()
     if not list_item:
         raise HTTPException(status_code=404, detail="List not found")
@@ -29,9 +29,9 @@ def create_card_for_list(
 @router.get("/{list_id}/cards/", response_model=List[schemas.Card])
 def read_cards(list_id: int, current_user = Depends(get_user), db: Session = Depends(get_db)):
     # Check ownership
-    list_item = db.query(app.models.List).join(app.models.Board).join(app.models.Workspace).filter(
-        app.models.List.id == list_id,
-        app.models.Workspace.owner_id == current_user.id
+    list_item = db.query(models.List).join(models.Board).join(models.Workspace).filter(
+        models.List.id == list_id,
+        models.Workspace.owner_id == current_user.id
     ).first()
     if not list_item:
         raise HTTPException(status_code=404, detail="List not found")
