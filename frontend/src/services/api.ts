@@ -1,0 +1,53 @@
+import axios from 'axios';
+import { Workspace, Board, ListItem, Card } from '../types';
+
+const api = axios.create({
+  baseURL: 'http://localhost:8000',
+});
+
+export { api };
+
+export const getWorkspaces = async (): Promise<Workspace[]> => {
+  const response = await api.get('/workspaces/');
+  return response.data;
+};
+
+export const createWorkspace = async (data: { name: string }): Promise<Workspace> => {
+  const response = await api.post('/workspaces/', data);
+  return response.data;
+};
+
+export const getBoards = async (workspaceId: number): Promise<Board[]> => {
+  const response = await api.get(`/workspaces/${workspaceId}/boards/`);
+  return response.data;
+};
+
+export const createBoard = async (workspaceId: number, data: { name: string }): Promise<Board> => {
+  const response = await api.post(`/workspaces/${workspaceId}/boards/`, data);
+  return response.data;
+};
+
+export const getLists = async (boardId: number): Promise<ListItem[]> => {
+  const response = await api.get(`/boards/${boardId}/lists/`);
+  return response.data;
+};
+
+export const createList = async (boardId: number, data: { name: string; position: number }): Promise<ListItem> => {
+  const response = await api.post(`/boards/${boardId}/lists/`, data);
+  return response.data;
+};
+
+export const getCards = async (listId: number): Promise<Card[]> => {
+  const response = await api.get(`/lists/${listId}/cards/`);
+  return response.data;
+};
+
+export const createCard = async (listId: number, data: { name: string; description?: string; position: number }): Promise<Card> => {
+  const response = await api.post(`/lists/${listId}/cards/`, data);
+  return response.data;
+};
+
+export const updateCard = async (listId: number, cardId: number, data: Partial<{ name: string; description?: string; position: number; list_id: number }>): Promise<Card> => {
+  const response = await api.patch(`/lists/${listId}/cards/${cardId}`, data);
+  return response.data;
+};
