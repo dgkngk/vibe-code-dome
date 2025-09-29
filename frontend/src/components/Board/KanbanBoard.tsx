@@ -139,3 +139,94 @@ const KanbanBoard: React.FC = () => {
                     {provided.placeholder}
                   </div>
                 )}
+              </Droppable>
+              <button
+                onClick={() => setShowAddCard(list.id)}
+                className="w-full bg-gray-200 p-2 rounded mt-2"
+              >
+                + Add Card
+              </button>
+            </div>
+          ))}
+        </div>
+      </DragDropContext>
+      <Modal
+        isOpen={showAddList}
+        onClose={() => {
+          setShowAddList(false);
+          setNewListName('');
+        }}
+        title="New List"
+      >
+        <input
+          type="text"
+          value={newListName}
+          onChange={(e) => setNewListName(e.target.value)}
+          placeholder="List name"
+          className="w-full p-2 border rounded mb-4"
+        />
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => {
+              setShowAddList(false);
+              setNewListName('');
+            }}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreateList}
+            className="px-4 py-2 bg-primary text-white rounded"
+          >
+            Create
+          </button>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={!!showAddCard}
+        onClose={() => {
+          setShowAddCard(null);
+          setNewCardName('');
+          setNewCardDesc('');
+        }}
+        title="New Card"
+      >
+        <input
+          type="text"
+          value={newCardName}
+          onChange={(e) => setNewCardName(e.target.value)}
+          placeholder="Card name"
+          className="w-full p-2 border rounded mb-4"
+        />
+        <textarea
+          value={newCardDesc}
+          onChange={(e) => setNewCardDesc(e.target.value)}
+          placeholder="Description (optional)"
+          className="w-full p-2 border rounded mb-4"
+          rows={3}
+        />
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => {
+              setShowAddCard(null);
+              setNewCardName('');
+              setNewCardDesc('');
+            }}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleCreateCard}
+            className="px-4 py-2 bg-primary text-white rounded"
+          >
+            Create
+          </button>
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default KanbanBoard;
