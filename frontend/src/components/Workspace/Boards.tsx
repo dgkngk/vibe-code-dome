@@ -44,22 +44,22 @@ const Boards: React.FC = () => {
     }
   };
 
-  if (!workspaceId) return <div>Invalid workspace</div>;
+  if (!workspaceId) return <div className="text-gray-900 dark:text-gray-100">Invalid workspace</div>;
 
   return (
-    <div className="container mx-auto p-4 flex-1">
-      <h1 className="text-2xl font-bold mb-4">{t('boards.title')}</h1>
+    <div className="container mx-auto p-4 flex-1 bg-gray-50 dark:bg-gray-900">
+      <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">{t('boards.title')}</h1>
       <button
         onClick={() => setShowModal(true)}
-        className="bg-primary text-white px-4 py-2 rounded mb-4"
+        className="bg-primary text-white px-4 py-2 rounded mb-4 hover:bg-primary-dark"
       >
         {t('new.board')}
       </button>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {boards.map((board) => (
-          <div key={board.id} className="bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-lg">
+          <div key={board.id} className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow cursor-pointer hover:shadow-lg dark:border dark:border-gray-700">
             <Link to={`/board/${board.id}`}>
-              <h3 className="font-semibold">{board.name}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100">{board.name}</h3>
             </Link>
           </div>
         ))}
@@ -70,13 +70,13 @@ const Boards: React.FC = () => {
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder={t('board.name.placeholder')}
-          className="w-full p-2 border rounded mb-4"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <div className="flex justify-end space-x-2">
-          <button onClick={() => { setShowModal(false); setNewName(''); }} className="px-4 py-2 bg-gray-300 rounded">
+          <button onClick={() => { setShowModal(false); setNewName(''); }} className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500">
             {t('cancel')}
           </button>
-          <button onClick={handleCreate} className="px-4 py-2 bg-primary text-white rounded">
+          <button onClick={handleCreate} className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark">
             {t('create')}
           </button>
         </div>

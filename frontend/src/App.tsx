@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext.tsx';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext.tsx';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext.tsx';
 import Login from './components/Auth/Login.tsx';
 import Register from './components/Auth/Register.tsx';
 import Navbar from './components/common/Navbar.tsx';
@@ -15,7 +16,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
+        <p className="text-gray-500 dark:text-gray-400">Loading...</p>
       </div>
     );
   }
@@ -42,7 +43,7 @@ const DashboardPlaceholder: React.FC = () => {
   const { t } = useLanguage();
   return (
     <div className="flex items-center justify-center h-full">
-      <p className="text-gray-500">{t('select.workspace')}</p>
+      <p className="text-gray-500 dark:text-gray-400">{t('select.workspace')}</p>
     </div>
   );
 };
@@ -62,22 +63,30 @@ const AppContent: React.FC = () => (
 
 const Footer: React.FC = () => {
   const { lang, setLang, t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   return (
-    <footer className="bg-white border-t border-gray-200 p-4 mt-auto">
-      <div className="text-center text-gray-500">
+    <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 mt-auto">
+      <div className="text-center text-gray-500 dark:text-gray-400">
         <div>{t('footer.message')}</div>
-        <div className="mt-2 flex justify-center space-x-4">
+        <div className="mt-2 flex justify-center space-x-4 items-center">
           <button
             onClick={() => setLang('en')}
-            className={`px-2 py-1 rounded ${lang === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            className={`px-2 py-1 rounded ${lang === 'en' ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-gray-600'}`}
           >
             {t('language.english')}
           </button>
           <button
             onClick={() => setLang('tr')}
-            className={`px-2 py-1 rounded ${lang === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+            className={`px-2 py-1 rounded ${lang === 'tr' ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-gray-600'}`}
           >
             {t('language.turkish')}
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="px-2 py-1 rounded bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+            title="Toggle theme"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
         </div>
       </div>
@@ -85,17 +94,21 @@ const Footer: React.FC = () => {
   );
 };
 
-const App: React.FC = () => (
-  <Router>
-    <LanguageProvider>
-      <AuthProvider>
-        <div className="flex flex-col min-h-screen bg-gray-100">
-          <AppContent />
-          <Footer />
-        </div>
-      </AuthProvider>
-    </LanguageProvider>
-  </Router>
-);
+const App: React.FC = () => {
+  return (
+    <Router>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+              <AppContent />
+              <Footer />
+            </div>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </Router>
+  );
+};
 
 export default App;

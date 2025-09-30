@@ -144,28 +144,28 @@ const KanbanBoard: React.FC = () => {
     }
   };
 
-  if (!boardId) return <div>Invalid board</div>;
+  if (!boardId) return <div className="text-gray-900 dark:text-gray-100">Invalid board</div>;
 
   return (
-    <div className="p-4 flex-1">
+    <div className="p-4 flex-1 bg-gray-50 dark:bg-gray-900">
       <DragDropContext onDragEnd={handleDragEnd}>
         <button
           onClick={() => setShowAddList(true)}
-          className="bg-primary text-white px-4 py-2 rounded mb-4 self-start"
+          className="bg-primary text-white px-4 py-2 rounded mb-4 self-start hover:bg-primary-dark"
         >
           {t('add.list')}
         </button>
         <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
           {lists.map((list) => (
-            <div key={list.id} className="min-w-[280px] bg-white rounded-lg shadow p-4 flex-shrink-0">
+            <div key={list.id} className="min-w-[280px] bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex-shrink-0 dark:border dark:border-gray-700">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold">{t('list.name', { listName: list.name })}</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('list.name', { listName: list.name })}</h3>
                 <button
                   onClick={() => {
                     setDeleteListId(list.id);
                     setShowDeleteListConfirm(true);
                   }}
-                  className="text-red-500 hover:text-red-700 text-xl"
+                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xl"
                 >
                   🗑️
                 </button>
@@ -184,13 +184,13 @@ const KanbanBoard: React.FC = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-blue-100 p-2 rounded mb-2 cursor-move relative"
+                            className="bg-blue-100 dark:bg-blue-900 p-2 rounded mb-2 cursor-move relative border dark:border-blue-800"
                           >
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="font-medium">{card.name}</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">{card.name}</p>
                                 {card.description && (
-                                  <p className="text-sm text-gray-600">{card.description}</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">{card.description}</p>
                                 )}
                               </div>
                               <button
@@ -201,7 +201,7 @@ const KanbanBoard: React.FC = () => {
                                   setDeleteCardName(card.name);
                                   setShowDeleteCardConfirm(true);
                                 }}
-                                className="text-red-500 hover:text-red-700 text-lg absolute top-1 right-1"
+                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-lg absolute top-1 right-1"
                               >
                                 🗑️
                               </button>
@@ -216,7 +216,7 @@ const KanbanBoard: React.FC = () => {
               </Droppable>
               <button
                 onClick={() => setShowAddCard(list.id)}
-                className="w-full bg-gray-200 p-2 rounded mt-2"
+                className="w-full bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 {t('add.card')}
               </button>
@@ -237,7 +237,7 @@ const KanbanBoard: React.FC = () => {
           value={newListName}
           onChange={(e) => setNewListName(e.target.value)}
           placeholder={t('board.name.placeholder')} // Reuse for list name
-          className="w-full p-2 border rounded mb-4"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <div className="flex justify-end space-x-2">
           <button
@@ -245,13 +245,13 @@ const KanbanBoard: React.FC = () => {
               setShowAddList(false);
               setNewListName('');
             }}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleCreateList}
-            className="px-4 py-2 bg-primary text-white rounded"
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
           >
             {t('create')}
           </button>
@@ -271,13 +271,13 @@ const KanbanBoard: React.FC = () => {
           value={newCardName}
           onChange={(e) => setNewCardName(e.target.value)}
           placeholder={t('card.name.placeholder')}
-          className="w-full p-2 border rounded mb-4"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <textarea
           value={newCardDesc}
           onChange={(e) => setNewCardDesc(e.target.value)}
           placeholder={t('description.placeholder')}
-          className="w-full p-2 border rounded mb-4"
+          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           rows={3}
         />
         <div className="flex justify-end space-x-2">
@@ -287,13 +287,13 @@ const KanbanBoard: React.FC = () => {
               setNewCardName('');
               setNewCardDesc('');
             }}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleCreateCard}
-            className="px-4 py-2 bg-primary text-white rounded"
+            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
           >
             {t('create')}
           </button>
@@ -307,20 +307,20 @@ const KanbanBoard: React.FC = () => {
         }}
         title={t('confirm.delete.list.title')}
       >
-        <p className="mb-4">{t('confirm.delete.list')}</p>
+        <p className="mb-4 text-gray-900 dark:text-gray-100">{t('confirm.delete.list')}</p>
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
               setShowDeleteListConfirm(false);
               setDeleteListId(null);
             }}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleDeleteList}
-            className="px-4 py-2 bg-red-500 text-white rounded"
+            className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-700"
           >
             {t('delete')}
           </button>
@@ -336,7 +336,7 @@ const KanbanBoard: React.FC = () => {
         }}
         title={t('confirm.delete.card.title')}
       >
-        <p className="mb-4">{t('confirm.delete.card', { cardName: deleteCardName })}</p>
+        <p className="mb-4 text-gray-900 dark:text-gray-100">{t('confirm.delete.card', { cardName: deleteCardName })}</p>
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
@@ -345,13 +345,13 @@ const KanbanBoard: React.FC = () => {
               setDeleteCardListId(null);
               setDeleteCardName('');
             }}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
             {t('cancel')}
           </button>
           <button
             onClick={handleDeleteCard}
-            className="px-4 py-2 bg-red-500 text-white rounded"
+            className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-700"
           >
             {t('delete')}
           </button>
