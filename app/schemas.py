@@ -88,6 +88,13 @@ class CardCreate(CardBase):
     pass
 
 
+class CardUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    position: Optional[int] = None
+    list_id: Optional[int] = None
+
+
 class Card(CardBase):
     id: int
     list_id: int
