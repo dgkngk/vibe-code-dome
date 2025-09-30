@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautif
 import { getLists, createList, getCards, createCard, updateCard, deleteList, deleteCard } from '../../services/api.ts';
 import { ListItem, Card } from '../../types';
 import Modal from '../common/Modal.tsx';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 const KanbanBoard: React.FC = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -20,6 +21,7 @@ const KanbanBoard: React.FC = () => {
   const [deleteCardId, setDeleteCardId] = useState<number | null>(null);
   const [deleteCardListId, setDeleteCardListId] = useState<number | null>(null);
   const [deleteCardName, setDeleteCardName] = useState('');
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -151,13 +153,13 @@ const KanbanBoard: React.FC = () => {
           onClick={() => setShowAddList(true)}
           className="bg-primary text-white px-4 py-2 rounded mb-4 self-start"
         >
-          + Add List
+          {t('add.list')}
         </button>
         <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
           {lists.map((list) => (
             <div key={list.id} className="min-w-[280px] bg-white rounded-lg shadow p-4 flex-shrink-0">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold">{list.name}</h3>
+                <h3 className="font-semibold">{t('list.name', { listName: list.name })}</h3>
                 <button
                   onClick={() => {
                     setDeleteListId(list.id);
@@ -216,7 +218,7 @@ const KanbanBoard: React.FC = () => {
                 onClick={() => setShowAddCard(list.id)}
                 className="w-full bg-gray-200 p-2 rounded mt-2"
               >
-                + Add Card
+                {t('add.card')}
               </button>
             </div>
           ))}
@@ -228,13 +230,13 @@ const KanbanBoard: React.FC = () => {
           setShowAddList(false);
           setNewListName('');
         }}
-        title="New List"
+        title={t('new.list.title')}
       >
         <input
           type="text"
           value={newListName}
           onChange={(e) => setNewListName(e.target.value)}
-          placeholder="List name"
+          placeholder={t('board.name.placeholder')} // Reuse for list name
           className="w-full p-2 border rounded mb-4"
         />
         <div className="flex justify-end space-x-2">
@@ -245,13 +247,13 @@ const KanbanBoard: React.FC = () => {
             }}
             className="px-4 py-2 bg-gray-300 rounded"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             onClick={handleCreateList}
             className="px-4 py-2 bg-primary text-white rounded"
           >
-            Create
+            {t('create')}
           </button>
         </div>
       </Modal>
@@ -262,19 +264,19 @@ const KanbanBoard: React.FC = () => {
           setNewCardName('');
           setNewCardDesc('');
         }}
-        title="New Card"
+        title={t('new.card.title')}
       >
         <input
           type="text"
           value={newCardName}
           onChange={(e) => setNewCardName(e.target.value)}
-          placeholder="Card name"
+          placeholder={t('card.name.placeholder')}
           className="w-full p-2 border rounded mb-4"
         />
         <textarea
           value={newCardDesc}
           onChange={(e) => setNewCardDesc(e.target.value)}
-          placeholder="Description (optional)"
+          placeholder={t('description.placeholder')}
           className="w-full p-2 border rounded mb-4"
           rows={3}
         />
@@ -287,13 +289,13 @@ const KanbanBoard: React.FC = () => {
             }}
             className="px-4 py-2 bg-gray-300 rounded"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             onClick={handleCreateCard}
             className="px-4 py-2 bg-primary text-white rounded"
           >
-            Create
+            {t('create')}
           </button>
         </div>
       </Modal>
@@ -303,9 +305,9 @@ const KanbanBoard: React.FC = () => {
           setShowDeleteListConfirm(false);
           setDeleteListId(null);
         }}
-        title="Confirm Delete List"
+        title={t('confirm.delete.list.title')}
       >
-        <p className="mb-4">Are you sure you want to delete this list? All cards in it will be permanently deleted.</p>
+        <p className="mb-4">{t('confirm.delete.list')}</p>
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
@@ -314,13 +316,13 @@ const KanbanBoard: React.FC = () => {
             }}
             className="px-4 py-2 bg-gray-300 rounded"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             onClick={handleDeleteList}
             className="px-4 py-2 bg-red-500 text-white rounded"
           >
-            Delete
+            {t('delete')}
           </button>
         </div>
       </Modal>
@@ -332,9 +334,9 @@ const KanbanBoard: React.FC = () => {
           setDeleteCardListId(null);
           setDeleteCardName('');
         }}
-        title="Confirm Delete Card"
+        title={t('confirm.delete.card.title')}
       >
-        <p className="mb-4">Are you sure you want to delete the card "{deleteCardName}"? This action cannot be undone.</p>
+        <p className="mb-4">{t('confirm.delete.card', { cardName: deleteCardName })}</p>
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
@@ -345,13 +347,13 @@ const KanbanBoard: React.FC = () => {
             }}
             className="px-4 py-2 bg-gray-300 rounded"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             onClick={handleDeleteCard}
             className="px-4 py-2 bg-red-500 text-white rounded"
           >
-            Delete
+            {t('delete')}
           </button>
         </div>
       </Modal>

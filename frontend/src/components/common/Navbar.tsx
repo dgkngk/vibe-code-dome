@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.tsx';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 interface NavbarProps {
   sidebarOpen: boolean;
@@ -9,6 +10,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   if (!user) return null; // Hide on login/register pages
@@ -29,16 +31,16 @@ const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           </button>
         )}
         <Link to="/dashboard" className="text-xl font-bold text-primary">
-          Trello Clone
+          {t('app.title')}
         </Link>
       </div>
       <div className="flex items-center space-x-4">
-        <span className="text-gray-700 hidden sm:block">Welcome, {user.username}</span>
+        <span className="text-gray-700 hidden sm:block">{t('welcome')} {user.username}</span>
         <button 
           onClick={handleLogout} 
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors"
         >
-          Logout
+          {t('logout')}
         </button>
       </div>
     </nav>

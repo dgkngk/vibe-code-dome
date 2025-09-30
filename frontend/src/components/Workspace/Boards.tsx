@@ -3,12 +3,14 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getBoards, createBoard } from '../../services/api.ts';
 import { Board } from '../../types.ts';
 import Modal from '../common/Modal.tsx';
+import { useLanguage } from '../../contexts/LanguageContext.tsx';
 
 const Boards: React.FC = () => {
   const { id: workspaceId } = useParams<{ id: string }>();
   const [boards, setBoards] = useState<Board[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newName, setNewName] = useState('');
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,12 +48,12 @@ const Boards: React.FC = () => {
 
   return (
     <div className="container mx-auto p-4 flex-1">
-      <h1 className="text-2xl font-bold mb-4">Boards</h1>
+      <h1 className="text-2xl font-bold mb-4">{t('boards.title')}</h1>
       <button
         onClick={() => setShowModal(true)}
         className="bg-primary text-white px-4 py-2 rounded mb-4"
       >
-        + New Board
+        {t('new.board')}
       </button>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {boards.map((board) => (
@@ -62,20 +64,20 @@ const Boards: React.FC = () => {
           </div>
         ))}
       </div>
-      <Modal isOpen={showModal} onClose={() => { setShowModal(false); setNewName(''); }} title="New Board">
+      <Modal isOpen={showModal} onClose={() => { setShowModal(false); setNewName(''); }} title={t('new.board')}>
         <input
           type="text"
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
-          placeholder="Board name"
+          placeholder={t('board.name.placeholder')}
           className="w-full p-2 border rounded mb-4"
         />
         <div className="flex justify-end space-x-2">
           <button onClick={() => { setShowModal(false); setNewName(''); }} className="px-4 py-2 bg-gray-300 rounded">
-            Cancel
+            {t('cancel')}
           </button>
           <button onClick={handleCreate} className="px-4 py-2 bg-primary text-white rounded">
-            Create
+            {t('create')}
           </button>
         </div>
       </Modal>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext.tsx';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext.tsx';
 import Login from './components/Auth/Login.tsx';
 import Register from './components/Auth/Register.tsx';
 import Navbar from './components/common/Navbar.tsx';
@@ -37,11 +38,14 @@ const DashboardLayout: React.FC = () => {
   );
 };
 
-const DashboardPlaceholder: React.FC = () => (
-  <div className="flex items-center justify-center h-full">
-    <p className="text-gray-500">Select a workspace from the sidebar to get started.</p>
-  </div>
-);
+const DashboardPlaceholder: React.FC = () => {
+  const { t } = useLanguage();
+  return (
+    <div className="flex items-center justify-center h-full">
+      <p className="text-gray-500">{t('select.workspace')}</p>
+    </div>
+  );
+};
 
 const AppContent: React.FC = () => (
   <Routes>
@@ -56,18 +60,41 @@ const AppContent: React.FC = () => (
   </Routes>
 );
 
+const Footer: React.FC = () => {
+  const { lang, setLang, t } = useLanguage();
+  return (
+    <footer className="bg-white border-t border-gray-200 p-4 mt-auto">
+      <div className="text-center text-gray-500">
+        <div>{t('footer.message')}</div>
+        <div className="mt-2 flex justify-center space-x-4">
+          <button
+            onClick={() => setLang('en')}
+            className={`px-2 py-1 rounded ${lang === 'en' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+          >
+            {t('language.english')}
+          </button>
+          <button
+            onClick={() => setLang('tr')}
+            className={`px-2 py-1 rounded ${lang === 'tr' ? 'bg-primary text-white' : 'bg-gray-200'}`}
+          >
+            {t('language.turkish')}
+          </button>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
 const App: React.FC = () => (
   <Router>
-    <AuthProvider>
-      <div className="flex flex-col min-h-screen bg-gray-100">
-        <AppContent />
-        <footer className="bg-white border-t border-gray-200 p-4 mt-auto">
-          <div className="text-center text-gray-500">
-            Made with love for my amazing wife ❤️
-          </div>
-        </footer>
-      </div>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <div className="flex flex-col min-h-screen bg-gray-100">
+          <AppContent />
+          <Footer />
+        </div>
+      </AuthProvider>
+    </LanguageProvider>
   </Router>
 );
 
