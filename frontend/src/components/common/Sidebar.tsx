@@ -4,7 +4,12 @@ import { getWorkspaces, createWorkspace } from '../../services/api.ts';
 import { Workspace } from '../../types.ts';
 import Modal from './Modal.tsx';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newName, setNewName] = useState('');
@@ -33,8 +38,18 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      <div className="w-64 bg-white shadow-lg h-screen p-4 flex flex-col">
-        <h2 className="text-xl font-bold mb-4">Workspaces</h2>
+      <div className={`transition-all duration-300 ease-in-out bg-white shadow-lg h-screen p-4 flex flex-col ${isOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Workspaces</h2>
+          {isOpen && (
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 text-xl"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         <button
           onClick={() => setShowModal(true)}
           className="bg-primary text-white px-4 py-2 rounded mb-4 w-full"

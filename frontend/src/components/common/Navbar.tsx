@@ -2,7 +2,12 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.tsx';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  sidebarOpen: boolean;
+  setSidebarOpen: (open: boolean) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -14,9 +19,19 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center">
-      <Link to="/dashboard" className="text-xl font-bold text-primary">
-        Trello Clone
-      </Link>
+      <div className="flex items-center space-x-4">
+        {!sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-xl text-primary"
+          >
+            ☰
+          </button>
+        )}
+        <Link to="/dashboard" className="text-xl font-bold text-primary">
+          Trello Clone
+        </Link>
+      </div>
       <div className="flex items-center space-x-4">
         <span className="text-gray-700 hidden sm:block">Welcome, {user.username}</span>
         <button 
