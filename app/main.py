@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
+app.include_router(auth.router, prefix="/auth")
 app.include_router(workspaces.router)
 app.include_router(boards.router)
 app.include_router(lists.router)
