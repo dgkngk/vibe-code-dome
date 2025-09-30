@@ -14,26 +14,26 @@ const ProtectedRoute: React.FC = () => {
 };
 
 const AppContent: React.FC = () => (
-  <Router>
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<><Navbar /><Workspaces /></>} />
-        <Route path="/workspace/:id" element={<><Navbar /><Boards /></>} />
-        <Route path="/board/:boardId" element={<><Navbar /><KanbanBoard /></>} />
-      </Route>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
-  </Router>
+  <Routes>
+    <Route path="/login" element={<Login />} />
+    <Route path="/register" element={<Register />} />
+    <Route element={<ProtectedRoute />}>
+      <Route path="/dashboard" element={<><Navbar /><Workspaces /></>} />
+      <Route path="/workspace/:id" element={<><Navbar /><Boards /></>} />
+      <Route path="/board/:boardId" element={<><Navbar /><KanbanBoard /></>} />
+    </Route>
+    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+  </Routes>
 );
 
 const App: React.FC = () => (
-  <AuthProvider>
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <AppContent />
-    </div>
-  </AuthProvider>
+  <Router>
+    <AuthProvider>
+      <div className="flex flex-col min-h-screen bg-gray-100">
+        <AppContent />
+      </div>
+    </AuthProvider>
+  </Router>
 );
 
 export default App;
