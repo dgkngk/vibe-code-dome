@@ -34,7 +34,7 @@ class Board(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    workspace_id = Column(Integer, ForeignKey("workspaces.id"))
+    workspace_id = Column(Integer, ForeignKey("workspaces.id", ondelete="CASCADE"))
 
     workspace = relationship("Workspace", back_populates="boards")
     lists = relationship("List", back_populates="board")
@@ -46,7 +46,7 @@ class List(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     position = Column(Integer)
-    board_id = Column(Integer, ForeignKey("boards.id"))
+    board_id = Column(Integer, ForeignKey("boards.id", ondelete="CASCADE"))
 
     board = relationship("Board", back_populates="lists")
     cards = relationship("Card", back_populates="list")
@@ -59,6 +59,6 @@ class Card(Base):
     name = Column(String, index=True)
     description = Column(String)
     position = Column(Integer)
-    list_id = Column(Integer, ForeignKey("lists.id"))
+    list_id = Column(Integer, ForeignKey("lists.id", ondelete="CASCADE"))
 
     list = relationship("List", back_populates="cards")

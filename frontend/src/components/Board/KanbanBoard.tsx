@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { getLists, createList, getCards, createCard, updateCard } from '../../services/api.ts';
+import { getLists, createList, getCards, createCard, updateCard, deleteList, deleteCard } from '../../services/api.ts';
 import { ListItem, Card } from '../../types';
 import Modal from '../common/Modal.tsx';
 
@@ -14,10 +14,23 @@ const KanbanBoard: React.FC = () => {
   const [newListName, setNewListName] = useState('');
   const [newCardName, setNewCardName] = useState('');
   const [newCardDesc, setNewCardDesc] = useState('');
+  const [showDeleteListConfirm, setShowDeleteListConfirm] = useState(false);
+  const [deleteListId, setDeleteListId] = useState<number | null>(null);
+  const [showDeleteCardConfirm, setShowDeleteCardConfirm] = useState(false);
+  const [deleteCardId, setDeleteCardId] = useState<number | null>(null);
+  const [deleteCardListId, setDeleteCardListId] = useState<number | null>(null);
+  const [deleteCardName, setDeleteCardName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (boardId) {
-      const fetchData = async () => {
+      fetchData();
+    }
+  }, [boardId]);
+
+  const fetchData = async () => {
+    if (boardId) {
+      try {
         const listsData = await getLists(Number(boardId));
         setLists(listsData);
         const cardsPromises = listsData.map(l => getCards(l.id));
@@ -27,10 +40,14 @@ const KanbanBoard: React.FC = () => {
           newCardsByList[l.id] = cardsArrays[index];
         });
         setCardsByList(newCardsByList);
-      };
-      fetchData();
+      } catch (error) {
+        console.error('Failed to fetch board data:', error);
+        if (error.response?.status === 404) {
+          navigate('/dashboard');
+        }
+      }
     }
-  }, [boardId]);
+  };
 
   const handleDragEnd = async (result: DropResult) => {
     if (!result.destination) return;
@@ -97,6 +114,34 @@ const KanbanBoard: React.FC = () => {
     }
   };
 
+  const handleDeleteList = async () => {
+    if (boardId && deleteListId) {
+      try {
+        await deleteList(Number(boardId), deleteListId);
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
+      setShowDeleteListConfirm(false);
+      setDeleteListId(null);
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    if (deleteCardListId && deleteCardId) {
+      try {
+        await deleteCard(deleteCardListId, deleteCardId);
+        fetchData();
+      } catch (error) {
+        console.error(error);
+      }
+      setShowDeleteCardConfirm(false);
+      setDeleteCardId(null);
+      setDeleteCardListId(null);
+      setDeleteCardName('');
+    }
+  };
+
   if (!boardId) return <div>Invalid board</div>;
 
   return (
@@ -111,7 +156,18 @@ const KanbanBoard: React.FC = () => {
         <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
           {lists.map((list) => (
             <div key={list.id} className="min-w-[280px] bg-white rounded-lg shadow p-4 flex-shrink-0">
-              <h3 className="font-semibold mb-2">{list.name}</h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-semibold">{list.name}</h3>
+                <button
+                  onClick={() => {
+                    setDeleteListId(list.id);
+                    setShowDeleteListConfirm(true);
+                  }}
+                  className="text-red-500 hover:text-red-700 text-xl"
+                >
+                  🗑️
+                </button>
+              </div>
               <Droppable droppableId={list.id.toString()}>
                 {(provided) => (
                   <div
@@ -126,12 +182,28 @@ const KanbanBoard: React.FC = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
-                            className="bg-blue-100 p-2 rounded mb-2 cursor-move"
+                            className="bg-blue-100 p-2 rounded mb-2 cursor-move relative"
                           >
-                            <p className="font-medium">{card.name}</p>
-                            {card.description && (
-                              <p className="text-sm text-gray-600">{card.description}</p>
-                            )}
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="font-medium">{card.name}</p>
+                                {card.description && (
+                                  <p className="text-sm text-gray-600">{card.description}</p>
+                                )}
+                              </div>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeleteCardId(card.id);
+                                  setDeleteCardListId(list.id);
+                                  setDeleteCardName(card.name);
+                                  setShowDeleteCardConfirm(true);
+                                }}
+                                className="text-red-500 hover:text-red-700 text-lg absolute top-1 right-1"
+                              >
+                                🗑️
+                              </button>
+                            </div>
                           </div>
                         )}
                       </Draggable>
@@ -222,6 +294,64 @@ const KanbanBoard: React.FC = () => {
             className="px-4 py-2 bg-primary text-white rounded"
           >
             Create
+          </button>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={showDeleteListConfirm}
+        onClose={() => {
+          setShowDeleteListConfirm(false);
+          setDeleteListId(null);
+        }}
+        title="Confirm Delete List"
+      >
+        <p className="mb-4">Are you sure you want to delete this list? All cards in it will be permanently deleted.</p>
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => {
+              setShowDeleteListConfirm(false);
+              setDeleteListId(null);
+            }}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDeleteList}
+            className="px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Delete
+          </button>
+        </div>
+      </Modal>
+      <Modal
+        isOpen={showDeleteCardConfirm}
+        onClose={() => {
+          setShowDeleteCardConfirm(false);
+          setDeleteCardId(null);
+          setDeleteCardListId(null);
+          setDeleteCardName('');
+        }}
+        title="Confirm Delete Card"
+      >
+        <p className="mb-4">Are you sure you want to delete the card "{deleteCardName}"? This action cannot be undone.</p>
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={() => {
+              setShowDeleteCardConfirm(false);
+              setDeleteCardId(null);
+              setDeleteCardListId(null);
+              setDeleteCardName('');
+            }}
+            className="px-4 py-2 bg-gray-300 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleDeleteCard}
+            className="px-4 py-2 bg-red-500 text-white rounded"
+          >
+            Delete
           </button>
         </div>
       </Modal>

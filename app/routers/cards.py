@@ -91,3 +91,21 @@ def update_card_for_list(
     db.commit()
     db.refresh(card)
     return card
+
+
+@router.delete("/{list_id}/cards/{card_id}/")
+def delete_card(
+    list_id: int,
+    card_id: int,
+    current_user = Depends(get_user),
+    db: Session = Depends(get_db)
+):
+    card = db.query(models.Card).join(models.List).join(models.Board).join(models.Workspace).filter(
+        models.Card.id == card_id,
+        models.Card.list_id == list_id,
+        models.Workspace.owner_id == current_user.id
+    ).first()
+    if not card:
+        raise HTTPException(status_code=404, detail="Card not found")
+    crud.delete_card(db, card_id)
+    return {"message": "Card deleted successfully"}

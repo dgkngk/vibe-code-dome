@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getBoards, createBoard } from '../../services/api.ts';
 import { Board } from '../../types.ts';
 import Modal from '../common/Modal.tsx';
@@ -9,16 +9,24 @@ const Boards: React.FC = () => {
   const [boards, setBoards] = useState<Board[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newName, setNewName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (workspaceId) {
       const fetchBoards = async () => {
-        const data = await getBoards(Number(workspaceId));
-        setBoards(data);
+        try {
+          const data = await getBoards(Number(workspaceId));
+          setBoards(data);
+        } catch (error) {
+          console.error('Failed to fetch boards:', error);
+          if (error.response?.status === 404) {
+            navigate('/dashboard');
+          }
+        }
       };
       fetchBoards();
     }
-  }, [workspaceId]);
+  }, [workspaceId, navigate]);
 
   const handleCreate = async () => {
     if (newName.trim() && workspaceId) {

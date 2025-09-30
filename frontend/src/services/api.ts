@@ -17,6 +17,10 @@ export const createWorkspace = async (data: { name: string }): Promise<Workspace
   return response.data;
 };
 
+export const deleteWorkspace = async (workspaceId: number): Promise<void> => {
+  await api.delete(`/workspaces/${workspaceId}/`);
+};
+
 export const getBoards = async (workspaceId: number): Promise<Board[]> => {
   const response = await api.get(`/workspaces/${workspaceId}/boards/`);
   return response.data;
@@ -37,6 +41,10 @@ export const createList = async (boardId: number, data: { name: string; position
   return response.data;
 };
 
+export const deleteList = async (boardId: number, listId: number): Promise<void> => {
+  await api.delete(`/boards/${boardId}/lists/${listId}/`);
+};
+
 export const getCards = async (listId: number): Promise<Card[]> => {
   const response = await api.get(`/lists/${listId}/cards/`);
   return response.data;
@@ -50,6 +58,10 @@ export const createCard = async (listId: number, data: { name: string; descripti
 export const updateCard = async (listId: number, cardId: number, data: Partial<{ name: string; description?: string; position: number; list_id: number }>): Promise<Card> => {
   const response = await api.patch(`/lists/${listId}/cards/${cardId}`, data);
   return response.data;
+};
+
+export const deleteCard = async (listId: number, cardId: number): Promise<void> => {
+  await api.delete(`/lists/${listId}/cards/${cardId}/`);
 };
 
 export const getCurrentUser = async (): Promise<User> => {

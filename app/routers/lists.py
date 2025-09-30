@@ -36,3 +36,21 @@ def read_lists(board_id: int, current_user = Depends(get_user), db: Session = De
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
     return crud.get_lists(db, board_id)
+
+
+@router.delete("/{board_id}/lists/{list_id}/")
+def delete_list(
+    board_id: int,
+    list_id: int,
+    current_user = Depends(get_user),
+    db: Session = Depends(get_db)
+):
+    list_item = db.query(models.List).join(models.Board).join(models.Workspace).filter(
+        models.List.id == list_id,
+        models.Board.id == board_id,
+        models.Workspace.owner_id == current_user.id
+    ).first()
+    if not list_item:
+        raise HTTPException(status_code=404, detail="List not found")
+    crud.delete_list(db, list_id)
+    return {"message": "List deleted successfully"}

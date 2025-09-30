@@ -31,6 +31,12 @@ def get_workspaces(db: Session, user_id: int):
     return db.query(models.Workspace).filter(models.Workspace.owner_id == user_id).all()
 
 
+def delete_workspace(db: Session, workspace_id: int) -> bool:
+    num_deleted = db.query(models.Workspace).filter(models.Workspace.id == workspace_id).delete()
+    db.commit()
+    return num_deleted > 0
+
+
 def create_board(db: Session, board: schemas.BoardCreate, workspace_id: int):
     db_board = models.Board(**board.dict(), workspace_id=workspace_id)
     db.add(db_board)
@@ -55,6 +61,12 @@ def get_lists(db: Session, board_id: int):
     return db.query(models.List).filter(models.List.board_id == board_id).order_by(models.List.position).all()
 
 
+def delete_list(db: Session, list_id: int) -> bool:
+    num_deleted = db.query(models.List).filter(models.List.id == list_id).delete()
+    db.commit()
+    return num_deleted > 0
+
+
 def create_card(db: Session, card: schemas.CardCreate, list_id: int):
     db_card = models.Card(**card.dict(), list_id=list_id)
     db.add(db_card)
@@ -65,3 +77,9 @@ def create_card(db: Session, card: schemas.CardCreate, list_id: int):
 
 def get_cards(db: Session, list_id: int):
     return db.query(models.Card).filter(models.Card.list_id == list_id).order_by(models.Card.position).all()
+
+
+def delete_card(db: Session, card_id: int) -> bool:
+    num_deleted = db.query(models.Card).filter(models.Card.id == card_id).delete()
+    db.commit()
+    return num_deleted > 0
