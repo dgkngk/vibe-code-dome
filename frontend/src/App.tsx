@@ -61,6 +61,11 @@ const App: React.FC = () => (
     <AuthProvider>
       <div className="flex flex-col min-h-screen bg-gray-100">
         <AppContent />
+        <footer className="bg-white border-t border-gray-200 p-4 mt-auto">
+          <div className="text-center text-gray-500">
+            Made with love for my amazing wife ❤️
+          </div>
+        </footer>
       </div>
     </AuthProvider>
   </Router>
