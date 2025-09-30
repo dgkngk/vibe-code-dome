@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getBoards, createBoard } from '../../services/api';
-import { Board } from '../../types';
-import Modal from '../common/Modal';
+import { getBoards, createBoard } from '../../services/api.ts';
+import { Board } from '../../types.ts';
+import Modal from '../common/Modal.tsx';
 
 const Boards: React.FC = () => {
   const { id: workspaceId } = useParams<{ id: string }>();

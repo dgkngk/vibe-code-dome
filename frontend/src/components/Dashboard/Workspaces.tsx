@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getWorkspaces, createWorkspace } from '../../services/api';
-import { Workspace } from '../../types';
-import Modal from '../common/Modal';
+import { getWorkspaces, createWorkspace } from '../../services/api.ts';
+import { Workspace } from '../../types.ts';
+import Modal from '../common/Modal.tsx';
 
 const Workspaces: React.FC = () => {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);

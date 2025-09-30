@@ -1,12 +1,12 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import Navbar from './components/common/Navbar';
-import Workspaces from './components/Dashboard/Workspaces';
-import Boards from './components/Workspace/Boards';
-import KanbanBoard from './components/Board/KanbanBoard';
+import { AuthProvider, useAuth } from './contexts/AuthContext.tsx';
+import Login from './components/Auth/Login.tsx';
+import Register from './components/Auth/Register.tsx';
+import Navbar from './components/common/Navbar.tsx';
+import Workspaces from './components/Dashboard/Workspaces.tsx';
+import Boards from './components/Workspace/Boards.tsx';
+import KanbanBoard from './components/Board/KanbanBoard.tsx';
 
 const ProtectedRoute: React.FC = () => {
   const { token } = useAuth();

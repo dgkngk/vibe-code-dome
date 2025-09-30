@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { getLists, createList, getCards, createCard, updateCard } from '../../services/api';
+import { getLists, createList, getCards, createCard, updateCard } from '../../services/api.ts';
 import { ListItem, Card } from '../../types';
-import Modal from '../common/Modal';
+import Modal from '../common/Modal.tsx';
 
 const KanbanBoard: React.FC = () => {
   const { boardId } = useParams<{ boardId: string }>();

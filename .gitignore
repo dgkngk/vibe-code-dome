@@ -2,3 +2,5 @@
 venv/
 *db
 *pyc
+node_modules
+__pycache__
