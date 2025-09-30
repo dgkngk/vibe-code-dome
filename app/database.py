@@ -1,20 +1,13 @@
-from sqlalchemy import create_engine, event
-import sqlite3
+import os
+from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./app.db"
+SQLALCHEMY_DATABASE_URL = os.getenv('SUPABASE_URL')
+if not SQLALCHEMY_DATABASE_URL:
+    raise ValueError("SUPABASE_URL environment variable is required. Set it to your Supabase PostgreSQL connection string (e.g., postgresql://[user]:[password]@[host]:[port]/[dbname]?sslmode=require)")
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
-
-@event.listens_for(engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    if isinstance(dbapi_connection, sqlite3.Connection):
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON;")
-        cursor.close()
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
