@@ -2,6 +2,8 @@
 
 A Trello-like clone built with FastAPI backend and React frontend. The frontend provides a mobile-friendly interface with authentication, workspace/board management, and a draggable Kanban board.
 
+Fully vibe coded using aider and grok-4-fast.
+
 ## Backend Setup
 
 1. Install dependencies: `pip install -r requirements.txt`
