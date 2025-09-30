@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
         Trello Clone
       </Link>
       <div className="flex items-center space-x-4">
-        <span className="text-gray-700 hidden sm:block">Welcome, {user.email}</span>
+        <span className="text-gray-700 hidden sm:block">Welcome, {user.username}</span>
         <button 
           onClick={handleLogout} 
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm transition-colors"

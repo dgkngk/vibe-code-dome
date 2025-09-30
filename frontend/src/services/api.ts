@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Workspace, Board, ListItem, Card } from '../types';
+import { Workspace, Board, ListItem, Card, User } from '../types';
 
 const api = axios.create({
   baseURL: 'http://localhost:8000',
@@ -49,5 +49,10 @@ export const createCard = async (listId: number, data: { name: string; descripti
 
 export const updateCard = async (listId: number, cardId: number, data: Partial<{ name: string; description?: string; position: number; list_id: number }>): Promise<Card> => {
   const response = await api.patch(`/lists/${listId}/cards/${cardId}`, data);
+  return response.data;
+};
+
+export const getCurrentUser = async (): Promise<User> => {
+  const response = await api.get('/auth/me');
   return response.data;
 };

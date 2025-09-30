@@ -2,12 +2,13 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api.ts';
 import { Token, User } from '../types.ts';
+import { getCurrentUser } from '../services/api.ts';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -20,10 +21,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    const storedEmail = localStorage.getItem('email');
-    if (storedToken && storedEmail) {
+    if (storedToken) {
       setToken(storedToken);
-      setUser({ id: 0, email: storedEmail, is_active: true, created_at: '' });
+      api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
   }, []);
 
@@ -31,10 +31,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (token) {
       localStorage.setItem('token', token);
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const fetchUser = async () => {
+        try {
+          const userData = await getCurrentUser();
+          setUser(userData);
+        } catch (error) {
+          console.error('Failed to fetch user', error);
+          setToken(null);
+        }
+      };
+      fetchUser();
     } else {
       localStorage.removeItem('token');
-      localStorage.removeItem('email');
       delete api.defaults.headers.common['Authorization'];
+      setUser(null);
     }
   }, [token]);
 
@@ -46,8 +56,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await api.post<{ access_token: string; token_type: string }>('/auth/token', params);
       const { access_token } = response.data;
       setToken(access_token);
-      localStorage.setItem('email', email);
-      setUser({ id: 0, email, is_active: true, created_at: '' });
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       navigate('/dashboard');
     } catch (error) {
@@ -55,9 +63,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (email: string, password: string, username: string) => {
     try {
-      await api.post('/auth/register', { email, password });
+      await api.post('/auth/register', { email, password, username });
       await login(email, password);
     } catch (error) {
       throw error;
