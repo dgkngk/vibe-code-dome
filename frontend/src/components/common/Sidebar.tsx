@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
-      <div className={`transition-all duration-300 ease-in-out bg-white shadow-lg h-screen p-4 flex flex-col ${isOpen ? 'w-64' : 'w-0 overflow-hidden'}`}>
+      <div className={`transition-all duration-300 ease-in-out bg-white shadow-lg h-screen flex flex-col ${isOpen ? 'w-64 p-4' : 'w-0 overflow-hidden'}`}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Workspaces</h2>
           {isOpen && (

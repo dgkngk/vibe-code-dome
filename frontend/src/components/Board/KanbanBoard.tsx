@@ -102,13 +102,13 @@ const KanbanBoard: React.FC = () => {
   return (
     <div className="p-4 flex-1">
       <DragDropContext onDragEnd={handleDragEnd}>
+        <button
+          onClick={() => setShowAddList(true)}
+          className="bg-primary text-white px-4 py-2 rounded mb-4 self-start"
+        >
+          + Add List
+        </button>
         <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
-          <button
-            onClick={() => setShowAddList(true)}
-            className="bg-primary text-white px-4 py-2 rounded self-start flex-shrink-0"
-          >
-            + Add List
-          </button>
           {lists.map((list) => (
             <div key={list.id} className="min-w-[280px] bg-white rounded-lg shadow p-4 flex-shrink-0">
               <h3 className="font-semibold mb-2">{list.name}</h3>
