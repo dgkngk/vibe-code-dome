@@ -48,6 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToken(access_token);
       localStorage.setItem('email', email);
       setUser({ id: 0, email, is_active: true, created_at: '' });
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       navigate('/dashboard');
     } catch (error) {
       throw error;
