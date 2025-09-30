@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -16,6 +16,15 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     workspaces = relationship("Workspace", back_populates="owner")
+    workspace_memberships = relationship("Workspace", secondary="workspace_members", back_populates="members")
+
+
+workspace_members = Table(
+    "workspace_members",
+    Base.metadata,
+    Column("workspace_id", Integer, ForeignKey("workspaces.id", ondelete="CASCADE"), primary_key=True),
+    Column("user_id", Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+)
 
 
 class Workspace(Base):
@@ -27,6 +36,7 @@ class Workspace(Base):
 
     owner = relationship("User", back_populates="workspaces")
     boards = relationship("Board", back_populates="workspace")
+    members = relationship("User", secondary="workspace_members", back_populates="workspace_memberships")
 
 
 class Board(Base):

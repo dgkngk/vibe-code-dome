@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class UserBase(BaseModel):
@@ -41,6 +41,7 @@ class WorkspaceCreate(WorkspaceBase):
 class Workspace(WorkspaceBase):
     id: int
     owner_id: int
+    members: List[User] = []
 
     class Config:
         from_attributes = True

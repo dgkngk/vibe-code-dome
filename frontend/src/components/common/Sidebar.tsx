@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext.tsx';
 import { getWorkspaces, createWorkspace, deleteWorkspace } from '../../services/api.ts';
 import { Workspace } from '../../types.ts';
 import Modal from './Modal.tsx';
@@ -16,17 +17,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const [newName, setNewName] = useState('');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteWsId, setDeleteWsId] = useState<number | null>(null);
+  const { user, isLoading } = useAuth();
   const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchWorkspaces = async () => {
-      const data = await getWorkspaces();
-      setWorkspaces(data);
-    };
-    fetchWorkspaces();
-  }, []);
+    if (!isLoading) {
+      const fetchWorkspaces = async () => {
+        const data = await getWorkspaces();
+        setWorkspaces(data);
+      };
+      fetchWorkspaces();
+    }
+  }, [isLoading]);
 
   const handleCreate = async () => {
     if (newName.trim()) {
@@ -52,13 +56,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         if (location.pathname === `/workspace/${deleteWsId}`) {
           navigate('/dashboard');
         }
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        if (error.response?.status === 403) {
+          alert('Only the owner can delete this workspace');
+        } else {
+          console.error(error);
+        }
       }
       setShowDeleteConfirm(false);
       setDeleteWsId(null);
     }
   };
+
+  if (isLoading) {
+    return <div className="w-64 p-4 bg-white dark:bg-gray-800">Loading...</div>;
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <>
@@ -89,17 +105,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             >
               <div className="flex justify-between items-center">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">{ws.name}</h3>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setDeleteWsId(ws.id);
-                    setShowDeleteConfirm(true);
-                  }}
-                  className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xl"
-                >
-                  🗑️
-                </button>
+                {ws.owner_id === user.id && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDeleteWsId(ws.id);
+                      setShowDeleteConfirm(true);
+                    }}
+                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xl"
+                  >
+                    🗑️
+                  </button>
+                )}
               </div>
             </Link>
           ))}

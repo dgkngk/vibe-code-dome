@@ -10,6 +10,7 @@ export interface Workspace {
   id: number;
   name: string;
   owner_id: number;
+  members: User[];
 }
 
 export interface Board {

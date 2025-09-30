@@ -55,6 +55,15 @@ const translations: { [lang: string]: Translation } = {
     'confirm.delete.card': 'Are you sure you want to delete the card "{cardName}"? This action cannot be undone.',
     'select.workspace': 'Select a workspace from the sidebar to get started.',
 
+    // Share Workspace
+    'share.workspace': 'Share Workspace',
+    'share.workspace.title': 'Share Workspace',
+    'current.members': 'Current Members',
+    'search.user.placeholder': 'Search by email',
+    'search.results': 'Search Results',
+    'add.member': 'Add Member',
+    'close': 'Close',
+
     // Footer
     'language.english': 'English',
     'language.turkish': 'Türkçe',
@@ -109,6 +118,15 @@ const translations: { [lang: string]: Translation } = {
     'confirm.delete.card.title': 'Kart Silmeyi Onayla',
     'confirm.delete.card': 'Kartı "{cardName}" silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
     'select.workspace': 'Başlamak için kenar çubuğundan bir çalışma alanı seçin.',
+
+    // Share Workspace
+    'share.workspace': 'Çalışma Alanını Paylaş',
+    'share.workspace.title': 'Çalışma Alanını Paylaş',
+    'current.members': 'Mevcut Üyeler',
+    'search.user.placeholder': 'E-posta ile ara',
+    'search.results': 'Arama Sonuçları',
+    'add.member': 'Üye Ekle',
+    'close': 'Kapat',
 
     // Footer
     'language.english': 'İngilizce',

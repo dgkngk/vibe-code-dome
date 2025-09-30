@@ -1,4 +1,5 @@
 from typing import List
+from sqlalchemy import or_
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -16,10 +17,11 @@ def create_list_for_board(
     current_user = Depends(get_user),
     db: Session = Depends(get_db)
 ):
-    # Check if user owns the board via workspace
     board = db.query(models.Board).join(models.Workspace).filter(
         models.Board.id == board_id,
-        models.Workspace.owner_id == current_user.id
+        or_(models.Workspace.owner_id == current_user.id, models.Workspace.id.in_(
+            db.query(models.workspace_members.c.workspace_id).filter(models.workspace_members.c.user_id == current_user.id)
+        ))
     ).first()
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
@@ -28,10 +30,11 @@ def create_list_for_board(
 
 @router.get("/{board_id}/lists/", response_model=List[schemas.List])
 def read_lists(board_id: int, current_user = Depends(get_user), db: Session = Depends(get_db)):
-    # Check ownership
     board = db.query(models.Board).join(models.Workspace).filter(
         models.Board.id == board_id,
-        models.Workspace.owner_id == current_user.id
+        or_(models.Workspace.owner_id == current_user.id, models.Workspace.id.in_(
+            db.query(models.workspace_members.c.workspace_id).filter(models.workspace_members.c.user_id == current_user.id)
+        ))
     ).first()
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
@@ -45,12 +48,6 @@ def delete_list(
     current_user = Depends(get_user),
     db: Session = Depends(get_db)
 ):
-    list_item = db.query(models.List).join(models.Board).join(models.Workspace).filter(
-        models.List.id == list_id,
-        models.Board.id == board_id,
-        models.Workspace.owner_id == current_user.id
-    ).first()
-    if not list_item:
+    if not crud.delete_list(db, list_id, current_user.id, board_id):
         raise HTTPException(status_code=404, detail="List not found")
-    crud.delete_list(db, list_id)
     return {"message": "List deleted successfully"}

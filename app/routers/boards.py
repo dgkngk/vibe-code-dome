@@ -1,4 +1,5 @@
 from typing import List
+from sqlalchemy import or_
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -16,10 +17,11 @@ def create_board_for_workspace(
     current_user = Depends(get_user),
     db: Session = Depends(get_db)
 ):
-    # Check if user owns the workspace
     workspace = db.query(models.Workspace).filter(
         models.Workspace.id == workspace_id,
-        models.Workspace.owner_id == current_user.id
+        or_(models.Workspace.owner_id == current_user.id, models.Workspace.id.in_(
+            db.query(models.workspace_members.c.workspace_id).filter(models.workspace_members.c.user_id == current_user.id)
+        ))
     ).first()
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")
@@ -28,10 +30,11 @@ def create_board_for_workspace(
 
 @router.get("/{workspace_id}/boards/", response_model=List[schemas.Board])
 def read_boards(workspace_id: int, current_user = Depends(get_user), db: Session = Depends(get_db)):
-    # Check ownership
     workspace = db.query(models.Workspace).filter(
         models.Workspace.id == workspace_id,
-        models.Workspace.owner_id == current_user.id
+        or_(models.Workspace.owner_id == current_user.id, models.Workspace.id.in_(
+            db.query(models.workspace_members.c.workspace_id).filter(models.workspace_members.c.user_id == current_user.id)
+        ))
     ).first()
     if not workspace:
         raise HTTPException(status_code=404, detail="Workspace not found")

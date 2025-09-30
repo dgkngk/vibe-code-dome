@@ -29,6 +29,11 @@ export const deleteWorkspace = async (workspaceId: number): Promise<void> => {
   await api.delete(`/workspaces/${workspaceId}/`);
 };
 
+export const getWorkspace = async (workspaceId: number): Promise<Workspace> => {
+  const response = await api.get(`/workspaces/${workspaceId}/`);
+  return response.data;
+};
+
 export const getBoards = async (workspaceId: number): Promise<Board[]> => {
   const response = await api.get(`/workspaces/${workspaceId}/boards/`);
   return response.data;
@@ -74,5 +79,20 @@ export const deleteCard = async (listId: number, cardId: number): Promise<void> 
 
 export const getCurrentUser = async (): Promise<User> => {
   const response = await api.get('/auth/me');
+  return response.data;
+};
+
+export const searchUsers = async (query: string): Promise<User[]> => {
+  const response = await api.get('/users/search/', { params: { q: query } });
+  return response.data;
+};
+
+export const addMember = async (workspaceId: number, userId: number): Promise<User> => {
+  const response = await api.post(`/workspaces/${workspaceId}/members/`, null, { params: { user_id: userId } });
+  return response.data;
+};
+
+export const getMembers = async (workspaceId: number): Promise<User[]> => {
+  const response = await api.get(`/workspaces/${workspaceId}/members/`);
   return response.data;
 };
