@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 import app.models as models
 import app.schemas as schemas
@@ -7,12 +8,12 @@ from app.auth import get_password_hash
 
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(models.User).filter(models.User.email == email).first()
+    return db.query(models.User).filter(func.lower(models.User.email) == email.lower()).first()
 
 
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password)
+    db_user = models.User(username=user.username, email=user.email.lower(), hashed_password=hashed_password)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)

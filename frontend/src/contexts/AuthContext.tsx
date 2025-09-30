@@ -1,12 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../services/api.ts';
-import { Token, User } from '../types.ts';
+import { User } from '../types.ts';
 import { getCurrentUser } from '../services/api.ts';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => void;
@@ -17,6 +18,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +26,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedToken) {
       setToken(storedToken);
       api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
@@ -35,9 +39,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const userData = await getCurrentUser();
           setUser(userData);
-        } catch (error) {
-          console.error('Failed to fetch user', error);
-          setToken(null);
+        } catch (error: any) {
+          console.error('Failed to fetch user on auth init/refresh:', {
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message,
+            tokenPreview: token ? `${token.substring(0, 20)}...` : 'no token'
+          });
+          // Do not setToken(null) here; let interceptor handle 401 logout
+          setUser(null);
+        } finally {
+          setIsLoading(false);
         }
       };
       fetchUser();
@@ -45,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('token');
       delete api.defaults.headers.common['Authorization'];
       setUser(null);
+      setIsLoading(false);
     }
   }, [token]);
 
@@ -72,17 +85,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setUser(null);
     setToken(null);
+    localStorage.removeItem('token');
+    delete api.defaults.headers.common['Authorization'];
     navigate('/login');
-  };
+  }, [navigate]);
 
   useEffect(() => {
     const interceptor = api.interceptors.response.use(
       (response) => response,
-      (error) => {
+      (error: any) => {
         if (error.response?.status === 401) {
+          console.error('401 detected - logging out (possible invalid/expired token):', {
+            url: error.config?.url,
+            tokenPreview: token ? `${token.substring(0, 20)}...` : 'no token',
+            errorData: error.response?.data
+          });
           logout();
         }
         return Promise.reject(error);
@@ -91,10 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       api.interceptors.response.eject(interceptor);
     };
-  }, []);
+  }, [logout, token]);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

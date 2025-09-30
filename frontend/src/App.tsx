@@ -10,7 +10,14 @@ import Boards from './components/Workspace/Boards.tsx';
 import KanbanBoard from './components/Board/KanbanBoard.tsx';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { token } = useAuth();
+  const { token, isLoading } = useAuth();
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
   return token ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
