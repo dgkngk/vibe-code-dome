@@ -7,7 +7,7 @@ interface Translation {
 const translations: { [lang: string]: Translation } = {
   en: {
     // Navbar
-    'app.title': 'Trello Clone',
+    'app.title': 'Dome',
     'welcome': 'Welcome,',
     'logout': 'Logout',
 
@@ -62,7 +62,7 @@ const translations: { [lang: string]: Translation } = {
   },
   tr: {
     // Navbar
-    'app.title': 'Trello Klonu',
+    'app.title': 'Dome',
     'welcome': 'Hoş geldin,',
     'logout': 'Çıkış Yap',
 
