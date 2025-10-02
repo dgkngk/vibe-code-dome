@@ -8,7 +8,9 @@ services:
     environment:
       - SUPABASE_URL=postgresql://user:password@db:5432/dome  # Changed 'localhost' to 'db'
     volumes:
-      - .:/app  # For development hot-reload; remove in production
+      - ./app:/app/app
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
     depends_on:
       db:
         condition: service_healthy  # Wait for DB healthcheck
