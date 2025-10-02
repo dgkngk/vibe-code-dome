@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -6,32 +6,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SUPABASE_URL=postgresql://user:password@db:5432/dome  # Changed 'localhost' to 'db'
+      - SUPABASE_URL=${SUPABASE_URL}
     volumes:
       - ./app:/app/app
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
-    depends_on:
-      db:
-        condition: service_healthy  # Wait for DB healthcheck
-
-  # Optional: If you want to run a local DB for testing (but use Supabase external)
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: dome
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:  # Added for reliable startup
-      test: ["CMD-SHELL", "pg_isready -U user -d dome"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
-volumes:
-  postgres_data:

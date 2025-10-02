@@ -28,11 +28,12 @@ RUN chmod +x entrypoint.sh
 # Expose port
 EXPOSE 8000
 
-# Use 'db' as host for Docker Compose networking (overridden by docker-compose.yml if needed)
-ENV SUPABASE_URL=postgresql://user:password@db:5432/dome
+ARG SUPABASE_URL
+ARG NODE_ENV
+ENV SUPABASE_URL=${SUPABASE_URL}
+ENV NODE_ENV=${NODE_ENV}
 
-# Install netcat for DB wait (lightweight; remove if using SQLAlchemy retries)
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+RUN alembic upgrade head
 
 # Use entrypoint script (handles wait, migrations, and server start)
-CMD ["./entrypoint.sh"]
+CMD uvicorn app.main:app --host 0.0.0.0 --port 8000
