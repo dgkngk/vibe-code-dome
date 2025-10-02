@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Workspace, Board, ListItem, Card, User } from '../types';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: '',
 });
 
 api.interceptors.request.use((config) => {
