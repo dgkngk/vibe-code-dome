@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   DragDropContext,
   Droppable,
@@ -15,12 +15,16 @@ import {
   deleteList,
   deleteCard,
 } from "../../services/api.ts";
-import { ListItem, Card } from "../../types";
+import { ListItem, Card, Board } from "../../types";
 import Modal from "../common/Modal.tsx";
 import { useLanguage } from "../../contexts/LanguageContext.tsx";
 import { useWebSocket } from "../../contexts/WebSocketContext.tsx";
 
-const KanbanBoard: React.FC = () => {
+interface KanbanBoardProps {
+  board: Board;
+}
+
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
   const { boardId } = useParams<{ boardId: string }>();
   const [lists, setLists] = useState<ListItem[]>([]);
   const [cardsByList, setCardsByList] = useState<Record<number, Card[]>>({});
@@ -188,6 +192,17 @@ const KanbanBoard: React.FC = () => {
 
   return (
     <div className="p-4 flex-1 bg-gray-50 dark:bg-gray-900">
+      <div className="flex items-center mb-4">
+        <Link
+          to={`/workspace/${board.workspace_id}`}
+          className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-bold py-1 px-2 rounded"
+        >
+          &larr; {t("go.back.workspace")}
+        </Link>
+        <h1 className="text-2xl font-bold ml-4 text-gray-900 dark:text-gray-100">
+          {board.name}
+        </h1>
+      </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <button
           onClick={() => setShowAddList(true)}

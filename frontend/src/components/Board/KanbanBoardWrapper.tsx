@@ -3,33 +3,34 @@ import { useParams } from "react-router-dom";
 import { getBoard } from "../../services/api.ts";
 import { WebSocketProvider } from "../../contexts/WebSocketContext.tsx";
 import KanbanBoard from "./KanbanBoard.tsx";
+import { Board } from "../../types.ts";
 
 const KanbanBoardWrapper: React.FC = () => {
   const { boardId } = useParams<{ boardId: string }>();
-  const [workspaceId, setWorkspaceId] = useState<number | null>(null);
+  const [board, setBoard] = useState<Board | null>(null);
 
   useEffect(() => {
-    const fetchWorkspaceId = async () => {
+    const fetchBoard = async () => {
       if (boardId) {
         try {
-          const board = await getBoard(Number(boardId));
-          setWorkspaceId(board.workspace_id);
+          const boardData = await getBoard(Number(boardId));
+          setBoard(boardData);
         } catch (error) {
-          console.error("Failed to fetch workspace ID:", error);
+          console.error("Failed to fetch board:", error);
         }
       }
     };
 
-    fetchWorkspaceId();
+    fetchBoard();
   }, [boardId]);
 
-  if (!workspaceId) {
+  if (!board) {
     return <div>Loading...</div>;
   }
 
   return (
-    <WebSocketProvider workspaceId={workspaceId}>
-      <KanbanBoard />
+    <WebSocketProvider workspaceId={board.workspace_id}>
+      <KanbanBoard board={board} />
     </WebSocketProvider>
   );
 };
