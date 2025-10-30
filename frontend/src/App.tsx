@@ -16,7 +16,7 @@ import Login from "./components/Auth/Login.tsx";
 import Register from "./components/Auth/Register.tsx";
 import Navbar from "./components/common/Navbar.tsx";
 import Sidebar from "./components/common/Sidebar.tsx";
-import Boards from "./components/Workspace/Boards.tsx";
+import WorkspaceWrapper from "./components/Workspace/WorkspaceWrapper.tsx";
 import KanbanBoard from "./components/Board/KanbanBoard.tsx";
 import KanbanBoardWrapper from "./components/Board/KanbanBoardWrapper.tsx";
 
@@ -73,7 +73,7 @@ const AppContent: React.FC = () => (
       }
     >
       <Route path="/dashboard" element={<DashboardPlaceholder />} />
-      <Route path="/workspace/:id" element={<Boards />} />
+      <Route path="/workspace/:id" element={<WorkspaceWrapper />} />
       <Route path="/board/:boardId" element={<KanbanBoardWrapper />} />
     </Route>
     <Route path="/" element={<Navigate to="/dashboard" replace />} />
