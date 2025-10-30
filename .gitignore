@@ -5,3 +5,6 @@ venv/
 node_modules
 __pycache__
 .vscode
+.idea
+.zed
+build/
