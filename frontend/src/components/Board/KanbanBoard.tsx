@@ -193,23 +193,25 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
   return (
     <div className="p-4 flex-1 bg-gray-50 dark:bg-gray-900">
       <div className="flex items-center mb-4">
-        <Link
-          to={`/workspace/${board.workspace_id}`}
-          className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-bold py-1 px-2 rounded"
-        >
-          &larr; {t("go.back.workspace")}
-        </Link>
-        <h1 className="text-2xl font-bold ml-4 text-gray-900 dark:text-gray-100">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           {board.name}
         </h1>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <button
-          onClick={() => setShowAddList(true)}
-          className="bg-primary text-white px-4 py-2 rounded mb-4 self-start hover:bg-primary-dark"
-        >
-          {t("add.list")}
-        </button>
+        <div className="flex items-center mb-4">
+          <Link
+            to={`/workspace/${board.workspace_id}`}
+            className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-bold py-2 px-4 rounded mr-4"
+          >
+            &larr; {t("go.back.workspace")}
+          </Link>
+          <button
+            onClick={() => setShowAddList(true)}
+            className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark"
+          >
+            {t("add.list")}
+          </button>
+        </div>
         <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
           {lists.map((list) => (
             <div
@@ -284,7 +286,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
               </Droppable>
               <button
                 onClick={() => setShowAddCard(list.id)}
-                className="w-full bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 hover:bg-gray-300 dark:hover:bg-gray-600"
+                className="w-full bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200"
               >
                 {t("add.card")}
               </button>
@@ -313,7 +315,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
               setShowAddList(false);
               setNewListName("");
             }}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100"
           >
             {t("cancel")}
           </button>
@@ -355,7 +357,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
               setNewCardName("");
               setNewCardDesc("");
             }}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100"
           >
             {t("cancel")}
           </button>
@@ -379,13 +381,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
           {t("confirm.delete.list")}
         </p>
         <div className="flex justify-end space-x-2">
-          <button
-            onClick={() => {
-              setShowDeleteListConfirm(false);
-              setDeleteListId(null);
-            }}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
-          >
+          <button className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100">
             {t("cancel")}
           </button>
           <button
@@ -417,7 +413,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
               setDeleteCardListId(null);
               setDeleteCardName("");
             }}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100"
           >
             {t("cancel")}
           </button>

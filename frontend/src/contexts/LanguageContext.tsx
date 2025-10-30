@@ -39,6 +39,7 @@ const translations: { [lang: string]: Translation } = {
 
     // Boards
     "boards.title": "Boards",
+    "boards.title.dynamic": "{workspaceName} - Boards",
     "new.board": "+ New Board",
     "board.name.placeholder": "Board name",
 
@@ -107,6 +108,7 @@ const translations: { [lang: string]: Translation } = {
 
     // Boards
     "boards.title": "Tablolar",
+    "boards.title.dynamic": "{workspaceName} - Tablolar",
     "new.board": "+ Yeni Tablo",
     "board.name.placeholder": "Tablo adı",
 

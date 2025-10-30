@@ -120,7 +120,9 @@ const Boards: React.FC = () => {
   return (
     <div className="container mx-auto p-4 flex-1 bg-gray-50 dark:bg-gray-900">
       <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-        {t("boards.title")}
+        {workspace
+          ? t("boards.title.dynamic", { workspaceName: workspace.name })
+          : t("boards.title")}
       </h1>
       <div className="flex space-x-4 mb-4">
         <button
@@ -173,7 +175,7 @@ const Boards: React.FC = () => {
               setShowCreateModal(false);
               setNewBoardName("");
             }}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100"
           >
             {t("cancel")}
           </button>
@@ -237,7 +239,7 @@ const Boards: React.FC = () => {
           <div className="flex justify-end space-x-2 mb-4">
             <button
               onClick={() => setSelectedUser(null)}
-              className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+              className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100"
             >
               {t("cancel")}
             </button>
@@ -252,7 +254,7 @@ const Boards: React.FC = () => {
         <div className="flex justify-end">
           <button
             onClick={() => setShowShareModal(false)}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
+            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100"
           >
             {t("close")}
           </button>
