@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
-import { getLists, createList, getCards, createCard, updateCard, deleteList, deleteCard } from '../../services/api.ts';
-import { ListItem, Card } from '../../types';
-import Modal from '../common/Modal.tsx';
-import { useLanguage } from '../../contexts/LanguageContext.tsx';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
+import {
+  getLists,
+  createList,
+  getCards,
+  createCard,
+  updateCard,
+  deleteList,
+  deleteCard,
+} from "../../services/api.ts";
+import { ListItem, Card } from "../../types";
+import Modal from "../common/Modal.tsx";
+import { useLanguage } from "../../contexts/LanguageContext.tsx";
+import { useWebSocket } from "../../contexts/WebSocketContext.tsx";
 
 const KanbanBoard: React.FC = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -12,17 +26,35 @@ const KanbanBoard: React.FC = () => {
   const [cardsByList, setCardsByList] = useState<Record<number, Card[]>>({});
   const [showAddList, setShowAddList] = useState(false);
   const [showAddCard, setShowAddCard] = useState<number | null>(null);
-  const [newListName, setNewListName] = useState('');
-  const [newCardName, setNewCardName] = useState('');
-  const [newCardDesc, setNewCardDesc] = useState('');
+  const [newListName, setNewListName] = useState("");
+  const [newCardName, setNewCardName] = useState("");
+  const [newCardDesc, setNewCardDesc] = useState("");
   const [showDeleteListConfirm, setShowDeleteListConfirm] = useState(false);
   const [deleteListId, setDeleteListId] = useState<number | null>(null);
   const [showDeleteCardConfirm, setShowDeleteCardConfirm] = useState(false);
   const [deleteCardId, setDeleteCardId] = useState<number | null>(null);
   const [deleteCardListId, setDeleteCardListId] = useState<number | null>(null);
-  const [deleteCardName, setDeleteCardName] = useState('');
+  const [deleteCardName, setDeleteCardName] = useState("");
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const webSocket = useWebSocket();
+
+  useEffect(() => {
+    if (webSocket && webSocket.lastMessage) {
+      const message = JSON.parse(webSocket.lastMessage.data);
+      if (message.type === "card_updated") {
+        fetchData();
+      } else if (message.type === "card_created") {
+        fetchData();
+      } else if (message.type === "card_deleted") {
+        fetchData();
+      } else if (message.type === "list_created") {
+        fetchData();
+      } else if (message.type === "list_deleted") {
+        fetchData();
+      }
+    }
+  }, [webSocket, webSocket?.lastMessage]);
 
   useEffect(() => {
     if (boardId) {
@@ -35,7 +67,7 @@ const KanbanBoard: React.FC = () => {
       try {
         const listsData = await getLists(Number(boardId));
         setLists(listsData);
-        const cardsPromises = listsData.map(l => getCards(l.id));
+        const cardsPromises = listsData.map((l) => getCards(l.id));
         const cardsArrays = await Promise.all(cardsPromises);
         const newCardsByList: Record<number, Card[]> = {};
         listsData.forEach((l, index) => {
@@ -43,9 +75,9 @@ const KanbanBoard: React.FC = () => {
         });
         setCardsByList(newCardsByList);
       } catch (error) {
-        console.error('Failed to fetch board data:', error);
+        console.error("Failed to fetch board data:", error);
         if (error.response?.status === 404) {
-          navigate('/dashboard');
+          navigate("/dashboard");
         }
       }
     }
@@ -60,7 +92,9 @@ const KanbanBoard: React.FC = () => {
       const [moved] = cards.splice(source.index, 1);
       cards.splice(destination.index, 0, moved);
       setCardsByList({ ...cardsByList, [listId]: cards });
-      await updateCard(listId, Number(draggableId), { position: destination.index });
+      await updateCard(listId, Number(draggableId), {
+        position: destination.index,
+      });
     } else {
       const sourceListId = Number(source.droppableId);
       const destListId = Number(destination.droppableId);
@@ -84,10 +118,13 @@ const KanbanBoard: React.FC = () => {
     if (newListName.trim() && boardId) {
       const position = lists.length;
       try {
-        const newList = await createList(Number(boardId), { name: newListName, position });
+        const newList = await createList(Number(boardId), {
+          name: newListName,
+          position,
+        });
         setLists([...lists, newList]);
         setShowAddList(false);
-        setNewListName('');
+        setNewListName("");
       } catch (error) {
         console.error(error);
       }
@@ -108,8 +145,8 @@ const KanbanBoard: React.FC = () => {
           [showAddCard]: [...(cardsByList[showAddCard] || []), newCard],
         });
         setShowAddCard(null);
-        setNewCardName('');
-        setNewCardDesc('');
+        setNewCardName("");
+        setNewCardDesc("");
       } catch (error) {
         console.error(error);
       }
@@ -140,11 +177,14 @@ const KanbanBoard: React.FC = () => {
       setShowDeleteCardConfirm(false);
       setDeleteCardId(null);
       setDeleteCardListId(null);
-      setDeleteCardName('');
+      setDeleteCardName("");
     }
   };
 
-  if (!boardId) return <div className="text-gray-900 dark:text-gray-100">Invalid board</div>;
+  if (!boardId)
+    return (
+      <div className="text-gray-900 dark:text-gray-100">Invalid board</div>
+    );
 
   return (
     <div className="p-4 flex-1 bg-gray-50 dark:bg-gray-900">
@@ -153,13 +193,18 @@ const KanbanBoard: React.FC = () => {
           onClick={() => setShowAddList(true)}
           className="bg-primary text-white px-4 py-2 rounded mb-4 self-start hover:bg-primary-dark"
         >
-          {t('add.list')}
+          {t("add.list")}
         </button>
         <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
           {lists.map((list) => (
-            <div key={list.id} className="min-w-[280px] bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex-shrink-0 dark:border dark:border-gray-700">
+            <div
+              key={list.id}
+              className="min-w-[280px] bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex-shrink-0 dark:border dark:border-gray-700"
+            >
               <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('list.name', { listName: list.name })}</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                  {t("list.name", { listName: list.name })}
+                </h3>
                 <button
                   onClick={() => {
                     setDeleteListId(list.id);
@@ -178,7 +223,11 @@ const KanbanBoard: React.FC = () => {
                     className="min-h-[200px]"
                   >
                     {cardsByList[list.id]?.map((card, index) => (
-                      <Draggable key={card.id} draggableId={card.id.toString()} index={index}>
+                      <Draggable
+                        key={card.id}
+                        draggableId={card.id.toString()}
+                        index={index}
+                      >
                         {(provided) => (
                           <div
                             ref={provided.innerRef}
@@ -188,9 +237,13 @@ const KanbanBoard: React.FC = () => {
                           >
                             <div className="flex justify-between items-start">
                               <div>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">{card.name}</p>
+                                <p className="font-medium text-gray-900 dark:text-gray-100">
+                                  {card.name}
+                                </p>
                                 {card.description && (
-                                  <p className="text-sm text-gray-600 dark:text-gray-300">{card.description}</p>
+                                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                                    {card.description}
+                                  </p>
                                 )}
                               </div>
                               <button
@@ -218,7 +271,7 @@ const KanbanBoard: React.FC = () => {
                 onClick={() => setShowAddCard(list.id)}
                 className="w-full bg-gray-200 dark:bg-gray-700 p-2 rounded mt-2 hover:bg-gray-300 dark:hover:bg-gray-600"
               >
-                {t('add.card')}
+                {t("add.card")}
               </button>
             </div>
           ))}
@@ -228,32 +281,32 @@ const KanbanBoard: React.FC = () => {
         isOpen={showAddList}
         onClose={() => {
           setShowAddList(false);
-          setNewListName('');
+          setNewListName("");
         }}
-        title={t('new.list.title')}
+        title={t("new.list.title")}
       >
         <input
           type="text"
           value={newListName}
           onChange={(e) => setNewListName(e.target.value)}
-          placeholder={t('board.name.placeholder')} // Reuse for list name
+          placeholder={t("board.name.placeholder")} // Reuse for list name
           className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
               setShowAddList(false);
-              setNewListName('');
+              setNewListName("");
             }}
             className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
-            {t('cancel')}
+            {t("cancel")}
           </button>
           <button
             onClick={handleCreateList}
             className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
           >
-            {t('create')}
+            {t("create")}
           </button>
         </div>
       </Modal>
@@ -261,22 +314,22 @@ const KanbanBoard: React.FC = () => {
         isOpen={!!showAddCard}
         onClose={() => {
           setShowAddCard(null);
-          setNewCardName('');
-          setNewCardDesc('');
+          setNewCardName("");
+          setNewCardDesc("");
         }}
-        title={t('new.card.title')}
+        title={t("new.card.title")}
       >
         <input
           type="text"
           value={newCardName}
           onChange={(e) => setNewCardName(e.target.value)}
-          placeholder={t('card.name.placeholder')}
+          placeholder={t("card.name.placeholder")}
           className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
         />
         <textarea
           value={newCardDesc}
           onChange={(e) => setNewCardDesc(e.target.value)}
-          placeholder={t('description.placeholder')}
+          placeholder={t("description.placeholder")}
           className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           rows={3}
         />
@@ -284,18 +337,18 @@ const KanbanBoard: React.FC = () => {
           <button
             onClick={() => {
               setShowAddCard(null);
-              setNewCardName('');
-              setNewCardDesc('');
+              setNewCardName("");
+              setNewCardDesc("");
             }}
             className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
-            {t('cancel')}
+            {t("cancel")}
           </button>
           <button
             onClick={handleCreateCard}
             className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark"
           >
-            {t('create')}
+            {t("create")}
           </button>
         </div>
       </Modal>
@@ -305,9 +358,11 @@ const KanbanBoard: React.FC = () => {
           setShowDeleteListConfirm(false);
           setDeleteListId(null);
         }}
-        title={t('confirm.delete.list.title')}
+        title={t("confirm.delete.list.title")}
       >
-        <p className="mb-4 text-gray-900 dark:text-gray-100">{t('confirm.delete.list')}</p>
+        <p className="mb-4 text-gray-900 dark:text-gray-100">
+          {t("confirm.delete.list")}
+        </p>
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
@@ -316,13 +371,13 @@ const KanbanBoard: React.FC = () => {
             }}
             className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
-            {t('cancel')}
+            {t("cancel")}
           </button>
           <button
             onClick={handleDeleteList}
             className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-700"
           >
-            {t('delete')}
+            {t("delete")}
           </button>
         </div>
       </Modal>
@@ -332,28 +387,30 @@ const KanbanBoard: React.FC = () => {
           setShowDeleteCardConfirm(false);
           setDeleteCardId(null);
           setDeleteCardListId(null);
-          setDeleteCardName('');
+          setDeleteCardName("");
         }}
-        title={t('confirm.delete.card.title')}
+        title={t("confirm.delete.card.title")}
       >
-        <p className="mb-4 text-gray-900 dark:text-gray-100">{t('confirm.delete.card', { cardName: deleteCardName })}</p>
+        <p className="mb-4 text-gray-900 dark:text-gray-100">
+          {t("confirm.delete.card", { cardName: deleteCardName })}
+        </p>
         <div className="flex justify-end space-x-2">
           <button
             onClick={() => {
               setShowDeleteCardConfirm(false);
               setDeleteCardId(null);
               setDeleteCardListId(null);
-              setDeleteCardName('');
+              setDeleteCardName("");
             }}
             className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500"
           >
-            {t('cancel')}
+            {t("cancel")}
           </button>
           <button
             onClick={handleDeleteCard}
             className="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded hover:bg-red-600 dark:hover:bg-red-700"
           >
-            {t('delete')}
+            {t("delete")}
           </button>
         </div>
       </Modal>

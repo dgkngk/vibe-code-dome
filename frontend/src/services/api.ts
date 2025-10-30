@@ -1,12 +1,12 @@
-import axios from 'axios';
-import { Workspace, Board, ListItem, Card, User } from '../types';
+import axios from "axios";
+import { Workspace, Board, ListItem, Card, User } from "../types";
 
 const api = axios.create({
-  baseURL: '',
+  baseURL: "",
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -16,12 +16,14 @@ api.interceptors.request.use((config) => {
 export { api };
 
 export const getWorkspaces = async (): Promise<Workspace[]> => {
-  const response = await api.get('/api/workspaces/');
+  const response = await api.get("/api/workspaces/");
   return response.data;
 };
 
-export const createWorkspace = async (data: { name: string }): Promise<Workspace> => {
-  const response = await api.post('/api/workspaces/', data);
+export const createWorkspace = async (data: {
+  name: string;
+}): Promise<Workspace> => {
+  const response = await api.post("/api/workspaces/", data);
   return response.data;
 };
 
@@ -39,8 +41,19 @@ export const getBoards = async (workspaceId: number): Promise<Board[]> => {
   return response.data;
 };
 
-export const createBoard = async (workspaceId: number, data: { name: string }): Promise<Board> => {
-  const response = await api.post(`/api/workspaces/${workspaceId}/boards/`, data);
+export const createBoard = async (
+  workspaceId: number,
+  data: { name: string },
+): Promise<Board> => {
+  const response = await api.post(
+    `/api/workspaces/${workspaceId}/boards/`,
+    data,
+  );
+  return response.data;
+};
+
+export const getBoard = async (boardId: number): Promise<Board> => {
+  const response = await api.get(`/api/workspaces/boards/${boardId}/`);
   return response.data;
 };
 
@@ -49,12 +62,18 @@ export const getLists = async (boardId: number): Promise<ListItem[]> => {
   return response.data;
 };
 
-export const createList = async (boardId: number, data: { name: string; position: number }): Promise<ListItem> => {
+export const createList = async (
+  boardId: number,
+  data: { name: string; position: number },
+): Promise<ListItem> => {
   const response = await api.post(`/api/boards/${boardId}/lists/`, data);
   return response.data;
 };
 
-export const deleteList = async (boardId: number, listId: number): Promise<void> => {
+export const deleteList = async (
+  boardId: number,
+  listId: number,
+): Promise<void> => {
   await api.delete(`/api/boards/${boardId}/lists/${listId}/`);
 };
 
@@ -63,32 +82,61 @@ export const getCards = async (listId: number): Promise<Card[]> => {
   return response.data;
 };
 
-export const createCard = async (listId: number, data: { name: string; description?: string; position: number }): Promise<Card> => {
+export const createCard = async (
+  listId: number,
+  data: { name: string; description?: string; position: number },
+): Promise<Card> => {
   const response = await api.post(`/api/lists/${listId}/cards/`, data);
   return response.data;
 };
 
-export const updateCard = async (listId: number, cardId: number, data: Partial<{ name: string; description?: string; position: number; list_id: number }>): Promise<Card> => {
-  const response = await api.patch(`/api/lists/${listId}/cards/${cardId}`, data);
+export const updateCard = async (
+  listId: number,
+  cardId: number,
+  data: Partial<{
+    name: string;
+    description?: string;
+    position: number;
+    list_id: number;
+  }>,
+): Promise<Card> => {
+  const response = await api.patch(
+    `/api/lists/${listId}/cards/${cardId}`,
+    data,
+  );
   return response.data;
 };
 
-export const deleteCard = async (listId: number, cardId: number): Promise<void> => {
+export const deleteCard = async (
+  listId: number,
+  cardId: number,
+): Promise<void> => {
   await api.delete(`/api/lists/${listId}/cards/${cardId}/`);
 };
 
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await api.get('/auth/me');
+  const response = await api.get("/auth/me");
   return response.data;
 };
 
 export const searchUsers = async (query: string): Promise<User[]> => {
-  const response = await api.get('/api/users/search/', { params: { q: query } });
+  const response = await api.get("/api/users/search/", {
+    params: { q: query },
+  });
   return response.data;
 };
 
-export const addMember = async (workspaceId: number, userId: number): Promise<User> => {
-  const response = await api.post(`/api/workspaces/${workspaceId}/members/`, null, { params: { user_id: userId } });
+export const addMember = async (
+  workspaceId: number,
+  userId: number,
+): Promise<User> => {
+  const response = await api.post(
+    `/api/workspaces/${workspaceId}/members/`,
+    null,
+    { params: { user_id: userId } },
+  );
+  console.log(workspaceId, userId);
+  console.log(response);
   return response.data;
 };
 
