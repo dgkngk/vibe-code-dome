@@ -44,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^16.18.0",
     "@types/react-beautiful-dnd": "^13.1.8"
   }
 }

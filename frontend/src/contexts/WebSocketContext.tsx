@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface WebSocketContextType {
   sendMessage: (message: string) => void;
@@ -16,15 +16,23 @@ interface WebSocketProviderProps {
   workspaceId: number;
 }
 
-export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, workspaceId }) => {
+export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({
+  children,
+  workspaceId,
+}) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [lastMessage, setLastMessage] = useState<MessageEvent | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/${workspaceId}`);
+    const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const host =
+      process.env.NODE_ENV === "production"
+        ? window.location.host
+        : "localhost:8000";
+    const ws = new WebSocket(`${proto}//${host}/ws/${workspaceId}`);
 
     ws.onopen = () => {
-      console.log('WebSocket connected');
+      console.log("WebSocket connected");
     };
 
     ws.onmessage = (event) => {
@@ -32,7 +40,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children, 
     };
 
     ws.onclose = () => {
-      console.log('WebSocket disconnected');
+      console.log("WebSocket disconnected");
     };
 
     setSocket(ws);
