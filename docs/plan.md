@@ -37,7 +37,7 @@ Since your application uses SQLAlchemy (Relational), **Cloud SQL for PostgreSQL*
 1.  **Create Cloud SQL Instance**:
     *   Go to the Google Cloud Console > SQL.
     *   Create a new PostgreSQL instance (match the version used in Supabase, likely 14 or 15).
-    *   Create a database (e.g., `dome`) and a user/Ao96EkDl=c:TV~V
+    *   Create a database (e.g., `dome`) and a user
 
 2.  **Export Data from Supabase**:
     *   Get your Supabase connection string.
@@ -89,15 +89,6 @@ We will deploy your Dockerized FastAPI app to Cloud Run.
     *   *Note*: For better security, consider using Cloud SQL Auth Proxy or Unix sockets for connection, but standard TCP is easier for the initial migration.
 
 ---
-
-gcloud run deploy dome-api \
-  --image europe-west1-docker.pkg.dev/dome-with-love/docker-repo/dome-app \
-  --region europe-west1 \
-  --allow-unauthenticated \
-  --add-cloudsql-instances dome-with-love:europe-west1:dome-pg \
-  --set-env-vars "DB_URL=postgresql+psycopg2://postgres:Ao96EkDl=c:TV~V@dome-with-love:europe-west1:dome-pg"
-
-dome-with-love:europe-west1:dome-pg
 
 ## Step 4: Frontend & Hosting Configuration
 
