@@ -2,17 +2,13 @@
 
 set -e  # Exit on any error
 
-# Wait for PostgreSQL to be ready
-echo "Waiting for database..."
-until nc -z db 5432; do
-  echo "Database is unavailable - sleeping for 2 seconds..."
-  sleep 2
-done
-echo "Database is up - running migrations..."
-
 # Run Alembic migrations
+# Note: For production, you might want to run this separately or be careful about concurrent migrations.
+echo "Running migrations..."
 alembic upgrade head
 
 # Start the FastAPI app
-echo "Starting FastAPI server..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+# Cloud Run injects the PORT environment variable
+PORT=${PORT:-8080}
+echo "Starting FastAPI server on port $PORT..."
+exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT"

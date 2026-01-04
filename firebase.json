@@ -1,0 +1,33 @@
+{
+  "hosting": {
+    "public": "frontend/build",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "dome-api",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/auth/**",
+        "run": {
+          "serviceId": "dome-api",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "/ws/**",
+        "run": {
+          "serviceId": "dome-api",
+          "region": "europe-west1"
+        }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
