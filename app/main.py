@@ -5,8 +5,6 @@ from app import models
 from app.database import engine
 from app.routers import auth, boards, cards, lists, websockets, workspaces
 
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI()
 
 app.add_middleware(

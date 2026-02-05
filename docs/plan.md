@@ -1,12 +1,12 @@
-# Migration Plan: Vibe Code Dome to Firebase/GCP
+# Deployment Plan: Vibe Code Dome on Firebase & Cloud Run with Supabase
 
-This plan outlines the steps to migrate the "Vibe Code Dome" application from Render/Supabase to the Firebase ecosystem (backed by Google Cloud Platform).
+This plan outlines the steps to deploy the "Vibe Code Dome" application using Google Cloud Run for the backend, Firebase Hosting for the frontend, and Supabase for the database.
 
 ## Architecture Overview
 
 *   **Frontend**: Hosted on **Firebase Hosting**.
 *   **Backend**: Docker container running on **Cloud Run** (serverless container platform).
-*   **Database**: Migrated from Supabase (Postgres) to **Cloud SQL for PostgreSQL**.
+*   **Database**: **Supabase** (PostgreSQL).
 *   **Integration**: Firebase Hosting rewrites will route API traffic to Cloud Run and serve static assets for the frontend.
 
 ---
@@ -15,8 +15,8 @@ This plan outlines the steps to migrate the "Vibe Code Dome" application from Re
 
 1.  **Create a Firebase Project**:
     *   Go to the [Firebase Console](https://console.firebase.google.com/).
-    *   Create a new project (e.g., `vibe-code-dome-migration`).
-    *   Upgrade the project to the **Blaze (Pay as you go)** plan (required for Cloud Run and Cloud SQL).
+    *   Create a new project (e.g., `vibe-code-dome`).
+    *   Upgrade the project to the **Blaze (Pay as you go)** plan (required for Cloud Run).
 
 2.  **Install CLIs**:
     *   Ensure you have the Firebase CLI installed: `npm install -g firebase-tools`
@@ -30,28 +30,14 @@ This plan outlines the steps to migrate the "Vibe Code Dome" application from Re
 
 ---
 
-## Step 2: Database Migration (Supabase -> Cloud SQL)
+## Step 2: Database Configuration (Supabase)
 
-Since your application uses SQLAlchemy (Relational), **Cloud SQL for PostgreSQL** is the compatible destination.
+The application will continue to use Supabase as the primary database.
 
-1.  **Create Cloud SQL Instance**:
-    *   Go to the Google Cloud Console > SQL.
-    *   Create a new PostgreSQL instance (match the version used in Supabase, likely 14 or 15).
-    *   Create a database (e.g., `dome`) and a user
-
-2.  **Export Data from Supabase**:
-    *   Get your Supabase connection string.
-    *   Run `pg_dump` to export your data:
-        ```bash
-        pg_dump "postgres://user:pass@host:port/db" --clean --if-exists --no-owner --no-privileges > backup.sql
-        ```
-
-3.  **Import to Cloud SQL**:
-    *   Connect to your Cloud SQL instance using the Cloud SQL Proxy or by allowing your IP.
-    *   Import the dump:
-        ```bash
-        psql "postgres://cloud_user:cloud_pass@cloud_host/dome" < backup.sql
-        ```
+1.  **Retrieve Connection Details**:
+    *   Go to your Supabase project settings.
+    *   Copy the **Connection String** (URI format). It should look like:
+        `postgresql://postgres:[PASSWORD]@db.project.supabase.co:5432/postgres`
 
 ---
 
@@ -69,24 +55,21 @@ We will deploy your Dockerized FastAPI app to Cloud Run.
     gcloud artifacts repositories create docker-repo --repository-format=docker --location=us-central1 --description="Docker repository"
     ```
 
-3.  **Build and Push Image**:
-    *   Build the image specifically for the backend (or use the existing multi-stage Dockerfile, but ideally, we serve static files via Firebase Hosting, so the backend only needs to serve the API).
-    *   *Recommendation*: Modify `entrypoint.sh` or the run command to ensure it binds to the correct port (Cloud Run sets `$PORT`).
-    *   Submit build to Cloud Build (simplest method):
+3.  **Build and Submit Image**:
+    *   Submit the build to Cloud Build:
         ```bash
         gcloud builds submit --tag us-central1-docker.pkg.dev/<PROJECT_ID>/docker-repo/vibe-app
         ```
 
 4.  **Deploy to Cloud Run**:
-    *   Deploy the container. Replace `<DB_CONNECTION_STRING>` with your new Cloud SQL connection string.
+    *   Deploy the container. **Crucially**, set the `SUPABASE_URL` environment variable.
         ```bash
         gcloud run deploy vibe-api \
-          --image us-central1-docker.pkg.dev/<PROJECT_ID>/docker-repo/vibe-app \
+          --image us-central1-docker.pkg.dev/<PROJECT_ID>/docker-repo/dome-app \
           --region us-central1 \
           --allow-unauthenticated \
-          --set-env-vars "SUPABASE_URL=postgresql+psycopg2://<USER>:<PASS>@<HOST>/<DB_NAME>"
+          --set-env-vars "SUPABASE_URL=<YOUR_SUPABASE_CONNECTION_STRING>"
         ```
-    *   *Note*: For better security, consider using Cloud SQL Auth Proxy or Unix sockets for connection, but standard TCP is easier for the initial migration.
 
 ---
 
@@ -95,13 +78,12 @@ We will deploy your Dockerized FastAPI app to Cloud Run.
 1.  **Initialize Firebase**:
     *   Run `firebase init` in the project root.
     *   Select **Hosting**.
-    *   Use an existing project (select the one created in Step 1).
-    *   **Public directory**: `frontend/build` (React's build output).
+    *   Use the existing project created in Step 1.
+    *   **Public directory**: `frontend/build`.
     *   **Configure as a single-page app**: **Yes**.
-    *   **Set up automatic builds and deploys with GitHub**: Optional.
 
 2.  **Configure `firebase.json`**:
-    *   Update the file to rewrite `/api` calls to your Cloud Run service.
+    *   Ensure `firebase.json` rewrites `/api` calls to the Cloud Run service:
     ```json
     {
       "hosting": {
@@ -130,8 +112,7 @@ We will deploy your Dockerized FastAPI app to Cloud Run.
 
 3.  **Build Frontend**:
     *   Navigate to `frontend/`.
-    *   Run `npm install` (if not done).
-    *   Run `npm run build`.
+    *   Run `npm install` and `npm run build`.
 
 4.  **Deploy**:
     *   From the root directory:
@@ -141,9 +122,9 @@ We will deploy your Dockerized FastAPI app to Cloud Run.
 
 ---
 
-## Summary of Changes
+## Summary
 
-*   **Data**: Moved from Supabase to Google Cloud SQL.
-*   **Compute**: Moved from Render to Cloud Run.
-*   **Static Assets**: Served via global CDN (Firebase Hosting).
-*   **Routing**: Unified under one Firebase Hosting domain.
+*   **Database**: Retained on **Supabase**.
+*   **Compute**: Hosted on **Cloud Run**.
+*   **Frontend**: Served via **Firebase Hosting**.
+*   **Cost**: Cloud SQL costs avoided; standard Supabase pricing applies.

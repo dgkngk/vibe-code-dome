@@ -21,7 +21,7 @@ from app.database import Base
 target_metadata = Base.metadata
 
 # Set sqlalchemy.url from environment variable
-db_url = os.getenv("DB_URL")
+db_url = os.getenv("SUPABASE_URL")
 if db_url:
     config.set_main_option("sqlalchemy.url", db_url)
 

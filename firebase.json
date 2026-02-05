@@ -7,21 +7,21 @@
         "source": "/api/**",
         "run": {
           "serviceId": "dome-api",
-          "region": "europe-west1"
+          "region": "us-central1"
         }
       },
       {
         "source": "/auth/**",
         "run": {
           "serviceId": "dome-api",
-          "region": "europe-west1"
+          "region": "us-central1"
         }
       },
       {
         "source": "/ws/**",
         "run": {
           "serviceId": "dome-api",
-          "region": "europe-west1"
+          "region": "us-central1"
         }
       },
       {
