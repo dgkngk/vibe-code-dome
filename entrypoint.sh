@@ -9,7 +9,7 @@ echo "Checking database status..."
 CHECK_STAMP=$(python3 -c "
 import os
 from sqlalchemy import create_engine, inspect
-url = os.getenv('SUPABASE_URL')
+url = os.getenv('DB_URL')
 if not url:
     exit(0)
 engine = create_engine(url)

@@ -4,7 +4,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SUPABASE_URL=postgresql://user:password@db:5432/dome
+      - PORT=8000
+      - DB_URL=postgresql://user:password@db:5432/dome
     volumes:
       - ./app:/app/app
       - ./alembic:/app/alembic
