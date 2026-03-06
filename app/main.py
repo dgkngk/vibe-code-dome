@@ -1,11 +1,14 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import FileResponse
-from starlette.staticfiles import StaticFiles
+from sqlalchemy import inspect
 
 from app import models
-from app.database import engine
+from app.database import Base, engine
 from app.routers import auth, boards, cards, lists, websockets, workspaces
+
+DEV_MODE = os.getenv("DEV_MODE", "false").lower() == "true"
 
 app = FastAPI()
 
@@ -17,20 +20,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-import os
+# Serve React frontend static files only in dev mode (production uses Firebase Hosting)
+if DEV_MODE:
+    from starlette.responses import FileResponse
+    from starlette.staticfiles import StaticFiles
 
-# Serve React frontend static files
-if os.path.exists("frontend/build/assets"):
-    app.mount("/assets", StaticFiles(directory="frontend/build/assets"), name="assets")
+    if os.path.exists("frontend/build/assets"):
+        app.mount("/assets", StaticFiles(directory="frontend/build/assets"), name="assets")
+
+    @app.get("/")
+    async def serve_spa():
+        index_path = "frontend/build/index.html"
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        return {"status": "dev", "message": "Frontend not built. Run 'npm run build' in frontend/."}
 
 
-# Serve index.html for SPA routing
-@app.get("/")
-async def serve_spa():
-    return FileResponse("frontend/build/index.html")
+@app.get("/health")
+async def health_check():
+    """Health check endpoint that also reports database table status in dev mode."""
+    result = {"status": "ok", "mode": "dev" if DEV_MODE else "production"}
+
+    if DEV_MODE:
+        try:
+            db_inspector = inspect(engine)
+            tables = db_inspector.get_table_names()
+            result["tables"] = tables
+            result["table_count"] = len(tables)
+        except Exception as error:
+            result["db_error"] = str(error)
+
+    return result
 
 
-# API routes with /api prefix to avoid conflicts with frontend routes
+# API routes
 app.include_router(auth.router, prefix="/auth")
 app.include_router(workspaces.router, prefix="/api")
 app.include_router(boards.router, prefix="/api")

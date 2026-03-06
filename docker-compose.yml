@@ -6,15 +6,16 @@ services:
     environment:
       - PORT=8000
       - DB_URL=postgresql://user:password@db:5432/dome
+      # Uncomment to enable dev mode (SPA serving, /health with table info)
+      # - DEV_MODE=true
     volumes:
       - ./app:/app/app
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
     depends_on:
       db:
-        condition: service_healthy # Wait for DB healthcheck
+        condition: service_healthy
 
-  # Optional: If you want to run a local DB for testing (but use Supabase external)
   db:
     image: postgres:15
     environment:
@@ -26,7 +27,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      # Added for reliable startup
       test: [ "CMD-SHELL", "pg_isready -U user -d dome" ]
       interval: 10s
       timeout: 5s

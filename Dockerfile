@@ -1,8 +1,8 @@
 # Multi-stage build: first build React frontend, then Python backend
-FROM node:18-alpine AS frontend-build
+FROM node:24-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci --only=production
+RUN npm install --legacy-peer-deps
 COPY frontend/ ./
 RUN npm run build
 
@@ -18,18 +18,19 @@ COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./alembic.ini
 
-# Copy entrypoint script
+# Copy built frontend from first stage
+COPY --from=frontend-build /app/frontend/build ./frontend/build
+
+# Copy entrypoint script and install system utilities
 COPY entrypoint.sh .
-RUN apt-get update && apt-get install -y dos2unix netcat-openbsd && dos2unix entrypoint.sh && chmod +x entrypoint.sh
+RUN apt-get update && apt-get install -y dos2unix netcat-openbsd \
+    && dos2unix entrypoint.sh && chmod +x entrypoint.sh \
+    && rm -rf /var/lib/apt/lists/*
 
 # Expose port
 EXPOSE 8000
 
-# Use 'db' as host for Docker Compose networking (overridden by docker-compose.yml if needed)
 ENV DB_URL=postgresql://user:password@db:5432/dome
-
-# Install netcat for DB wait (lightweight; remove if using SQLAlchemy retries)
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 # Use entrypoint script (handles wait, migrations, and server start)
 CMD ["./entrypoint.sh"]
