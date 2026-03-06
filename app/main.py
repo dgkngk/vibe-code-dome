@@ -19,8 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+
 # Serve React frontend static files
-app.mount("/static", StaticFiles(directory="frontend/build/static"), name="static")
+if os.path.exists("frontend/build/assets"):
+    app.mount("/assets", StaticFiles(directory="frontend/build/assets"), name="assets")
 
 
 # Serve index.html for SPA routing

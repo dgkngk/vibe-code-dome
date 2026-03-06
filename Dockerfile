@@ -2,7 +2,7 @@
 FROM node:18-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package*.json ./
-RUN npm ci --only=production
+RUN npm install --legacy-peer-deps
 COPY frontend/ ./
 RUN npm run build
 
@@ -23,7 +23,7 @@ COPY --from=frontend-build /app/frontend/build ./frontend/build
 
 # Copy entrypoint script
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+RUN apt-get update && apt-get install -y dos2unix netcat-openbsd && dos2unix entrypoint.sh && chmod +x entrypoint.sh
 
 # Expose port
 EXPOSE 8000
