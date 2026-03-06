@@ -212,11 +212,11 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ board }) => {
             {t("add.list")}
           </button>
         </div>
-        <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4">
+        <div className="kanban-lists flex overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {lists.map((list) => (
             <div
               key={list.id}
-              className="min-w-[280px] bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex-shrink-0 dark:border dark:border-gray-700"
+              className="w-[85vw] sm:w-[320px] max-w-[320px] min-w-[280px] bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex-shrink-0 dark:border dark:border-gray-700 snap-center sm:snap-align-none"
             >
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">

@@ -1,3 +1,11 @@
+# Multi-stage build: first build React frontend, then Python backend
+FROM node:18-alpine AS frontend-build
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci --only=production
+COPY frontend/ ./
+RUN npm run build
+
 FROM python:3.11-slim AS backend
 WORKDIR /app
 
@@ -12,7 +20,7 @@ COPY alembic.ini ./alembic.ini
 
 # Copy entrypoint script
 COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+RUN apt-get update && apt-get install -y dos2unix netcat-openbsd && dos2unix entrypoint.sh && chmod +x entrypoint.sh
 
 # Expose port
 EXPOSE 8000

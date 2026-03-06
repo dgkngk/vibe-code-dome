@@ -15,6 +15,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+
+# Serve React frontend static files
+if os.path.exists("frontend/build/assets"):
+    app.mount("/assets", StaticFiles(directory="frontend/build/assets"), name="assets")
+
+
+# Serve index.html for SPA routing
+@app.get("/")
+async def serve_spa():
+    return FileResponse("frontend/build/index.html")
+
+
 # API routes with /api prefix to avoid conflicts with frontend routes
 app.include_router(auth.router, prefix="/auth")
 app.include_router(workspaces.router, prefix="/api")
